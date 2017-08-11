@@ -20,6 +20,12 @@ defmodule PhoenixDatatablesExampleWeb.Router do
     resources "/items", ItemController
   end
 
+  scope "/api", PhoenixDatatablesExampleWeb do
+    pipe_through :api
+
+    get "/items", ItemTableController, :index
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", PhoenixDatatablesExampleWeb do
   #   pipe_through :api
