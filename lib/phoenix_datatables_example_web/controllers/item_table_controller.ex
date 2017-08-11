@@ -6,9 +6,11 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableController do
 
   action_fallback PhoenixDatatablesExampleWeb.FallbackController
 
-  def index(conn, _params) do
+  def index(conn, params) do
     items_tables = Stock.list_items()
-    render(conn, "index.json", items_tables: items_tables)
+    draw = params["draw"]
+    IO.inspect draw
+    render(conn, "index.json", items_tables: items_tables, draw: draw)
   end
 
 end

@@ -6,4 +6,10 @@ export default function() {
   $('[data-datatable]').dataTable({
     lengthChange: false,
   });
+
+  $('[data-datatable-server]').dataTable({
+    lengthChange: false,
+    serverSide: true,
+    ajax: 'api/items'
+  });
 }
