@@ -51,8 +51,6 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :phoenix_datatables_example, PhoenixDatatablesExample.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
   database: "phoenix_datatables_example_dev",
   hostname: "localhost",
   pool_size: 10

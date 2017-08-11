@@ -10,6 +10,15 @@ export default function() {
   $('[data-datatable-server]').dataTable({
     lengthChange: false,
     serverSide: true,
-    ajax: 'api/items'
+    ajax: 'api/items',
+    columns: [
+      { data: "nsn" },
+      { data: "rep_office" },
+      { data: "common_name" },
+      { data: "description" },
+      { data: "price" },
+      { data: "ui" },
+      { data: "aac" }
+    ]
   });
 }
