@@ -40,14 +40,17 @@ exports.config = {
     watched: ["static", "css", "js", "vendor"],
     // Where to compile files to
     public: "../priv/static"
-  },
+ },
 
   // Configure your plugins
   plugins: {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/]
-    }
+    },
+    copycat: {
+      'images': [ 'node_modules/datatables.net-dt/images' ],
+    },
   },
 
   modules: {
@@ -57,6 +60,9 @@ exports.config = {
   },
 
   npm: {
-    enabled: true
+    enabled: true,
+    styles: {
+      'datatables.net-dt': [ 'css/jquery.dataTables.css' ],
+    },
   }
 };
