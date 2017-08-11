@@ -1,6 +1,6 @@
 <h2>Listing Items</h2>
 
-<table class="table">
+<table data-datatable class="table">
   <thead>
     <tr>
       <th>Nsn</th>
