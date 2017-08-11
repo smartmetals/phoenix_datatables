@@ -17,7 +17,7 @@ defmodule Seeds.NationalStockNumber do
 
     File.stream!(Path.expand(csv_path))
     |> MyParser.parse_stream
-    |> Stream.each(fn [aac, common_name, description, nsn, price, rep_office, ui] ->
+    |> Stream.each(fn [nsn, rep_office, common_name, description, price, ui, aac] ->
       process_csv_row(
         %{aac: aac,
           common_name: common_name,
