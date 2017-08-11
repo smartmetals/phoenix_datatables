@@ -1,0 +1,43 @@
+<h2>Show Item</h2>
+
+<ul>
+
+  <li>
+    <strong>Nsn:</strong>
+    <%= @item.nsn %>
+  </li>
+
+  <li>
+    <strong>Rep office:</strong>
+    <%= @item.rep_office %>
+  </li>
+
+  <li>
+    <strong>Common name:</strong>
+    <%= @item.common_name %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @item.description %>
+  </li>
+
+  <li>
+    <strong>Price:</strong>
+    <%= @item.price %>
+  </li>
+
+  <li>
+    <strong>Ui:</strong>
+    <%= @item.ui %>
+  </li>
+
+  <li>
+    <strong>Aac:</strong>
+    <%= @item.aac %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: item_path(@conn, :edit, @item) %></span>
+<span><%= link "Back", to: item_path(@conn, :index) %></span>
