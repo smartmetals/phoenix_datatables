@@ -25,5 +25,13 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableViewTest do
       })
       assert response.data |> Enum.count == 2
     end
+
+    test "response can be encoded to json" do
+      response = ItemTableView.render("index.json", %{
+         items: @items, draw: 1
+      })
+      {result, _} = Poison.encode(response)
+      assert result == :ok
+    end
   end
 end

@@ -8,7 +8,7 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableController do
   def index(conn, params) do
     items = Stock.list_items()
     draw = params["draw"]
-    render(conn, "index.json", items: items, draw: draw)
+    render(conn, :index, items: items, draw: draw)
   end
 
 end

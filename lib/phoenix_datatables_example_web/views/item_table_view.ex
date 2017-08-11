@@ -7,7 +7,20 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableView do
       draw: draw,
       recordsTotal: 1,
       recordsFiltered: 1,
-      data: items
+      data: Enum.map(items, &item_json/1)
     }
   end
+
+  def item_json(item) do
+    %{
+      nsn: item.nsn,
+      rep_office: item.rep_office,
+      common_name: item.common_name,
+      description: item.description,
+      price: item.price,
+      ui: item.ui,
+      aac: item.aac
+    }
+  end
+
 end

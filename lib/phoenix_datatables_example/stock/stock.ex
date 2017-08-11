@@ -18,7 +18,9 @@ defmodule PhoenixDatatablesExample.Stock do
 
   """
   def list_items do
-    Repo.all(Item)
+    Item
+    |> limit(25)
+    |> Repo.all()
   end
 
   @doc """
