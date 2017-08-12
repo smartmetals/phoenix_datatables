@@ -3,11 +3,14 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableViewTest do
   alias PhoenixDatatablesExampleWeb.ItemTableView
 
   @items [
-    %{field1: "f1v1",
-      field2: "f2v1"
-     },
-    %{field1: "f2v1",
-      field2: "f2v2"
+    %{
+      nsn: "NSN1",
+      rep_office: "office1",
+      common_name: "pots",
+      description: "you know - pots",
+      price: 12.65,
+      ui: "EA",
+      aac: "H"
     }
   ]
 
@@ -23,7 +26,7 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableViewTest do
       response = ItemTableView.render("index.json", %{
         items: @items, draw: 1
       })
-      assert response.data |> Enum.count == 2
+      assert response.data |> Enum.count == 1
     end
 
     test "response can be encoded to json" do
