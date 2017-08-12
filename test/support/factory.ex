@@ -1,4 +1,4 @@
-defmodule PhoenixDatatablesExampleWeb.Factory do
+defmodule PhoenixDatatablesExample.Factory do
   def item do
     %{
       nsn: "NSN1",

@@ -1,6 +1,6 @@
 defmodule PhoenixDatatablesExampleWeb.ItemTableControllerTest do
   use PhoenixDatatablesExampleWeb.ConnCase
-  alias PhoenixDatatablesExampleWeb.Factory
+  alias PhoenixDatatablesExample.Factory
   alias PhoenixDatatablesExample.Stock
 
   setup %{conn: conn} do
