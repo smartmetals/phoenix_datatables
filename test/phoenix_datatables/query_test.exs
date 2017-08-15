@@ -30,8 +30,6 @@ defmodule PhoenixDatatables.QueryTest do
 
   describe "paginate" do
     test "appends appropriate paginate clauses to a single-table queryable request" do
-      item = add_items()
-
       received_params = %{
         "_" => "1502482464715",
         "columns" =>
@@ -50,8 +48,19 @@ defmodule PhoenixDatatables.QueryTest do
         "order" => %{"0" => %{"column" => "0", "dir" => "asc"}},
         "search" => %{"regex" => "false", "value" => ""},
         "start" => "0"
-      } |> Poison.encode!
-      Query.paginate(Item, Request.receive(received_params))
+      }
+      query = Query.paginate(Item, Request.receive(received_params))
+      [{length, _}] = query.limit.params
+      assert length == String.to_integer(received_params["length"])
+      [{offset, _}] = query.offset.params
+      assert offset == String.to_integer(received_params["start"])
+    end
+  end
+
+  describe "total_entries" do
+    test "returns the total number of entries in the table" do
+      add_items()
+      assert Query.total_entries(Item, Repo) == 1
     end
   end
 
