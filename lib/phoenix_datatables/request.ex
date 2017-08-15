@@ -46,17 +46,13 @@ defmodule PhoenixDatatables.Request do
   import Ecto.Query
 
   def receive(params) do
-    decoded_params = params
-    |> Poison.decode!(as: %Params{
-      search: %Search{},
-    })
 
     orders =
-      for {_key, val} <- decoded_params.order do
+      for {_key, val} <- params["order"] do
         %Order{column: val["column"], dir: val["dir"]}
       end
     columns =
-      for {_key, val} <- decoded_params.columns do
+      for {_key, val} <- params["columns"] do
         %Column{
           data: val["data"],
           name: val["name"],
@@ -65,10 +61,19 @@ defmodule PhoenixDatatables.Request do
           search: %Search{value: val["search"]["value"], regex: val["search"]["regex"]}
         }
       end
-    Map.merge(decoded_params, %{
-      columns: columns,
-      order: orders
-    })
+    search =
+      %Search {
+        value: params["search"]["value"],
+        regex: params["search"]["regex"]
+      }
+
+    %Params{ draw: params["draw"],
+             order: orders,
+             search: search,
+             columns: columns,
+             start: params["start"] || 0,
+             length: params["length"] || 10
+    }
   end
 
   def send(queryable, _params, repo) do
