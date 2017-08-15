@@ -26,8 +26,8 @@ defmodule PhoenixDatatables.RequestTest do
         "search" => %{"regex" => "false", "value" => ""},
         "start" => "0"
       }
+
       received_params_json = received_params
-      |> Poison.encode!
 
       assert %Request.Params{
         draw: "1",
