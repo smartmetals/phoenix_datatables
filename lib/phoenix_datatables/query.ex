@@ -1,4 +1,5 @@
 defmodule PhoenixDatatables.Query do
+<<<<<<< HEAD
   import Ecto.Query
   alias PhoenixDatatables.Request.Params
 
@@ -22,4 +23,13 @@ defmodule PhoenixDatatables.Query do
   defp cast_dir("desc"), do: :desc
   defp cast_dir(wrong), do: raise ArgumentError, "#{wrong} is not a valid sort order."
 
+  def paginate(queryable, params) do
+    page_number = 2
+    page_size = 10
+    offset  = page_size * (page_number - 1)
+
+    queryable
+    |> limit(page_size)
+    |> offset(offset)
+  end
 end

@@ -47,6 +47,7 @@ defmodule PhoenixDatatables.RequestTest do
         }
       } = Request.receive(received_params_json)
     end
+<<<<<<< HEAD
 
     test "send/2 accepts params (in struct form) and query_by_params, and returns datatables-ready data" do
       params = %Request.Params{
@@ -70,5 +71,7 @@ defmodule PhoenixDatatables.RequestTest do
       Request.send(Item, params, Repo)
       |> IO.inspect
     end
+=======
+>>>>>>> cbf5b0a... paginate started
   end
 end

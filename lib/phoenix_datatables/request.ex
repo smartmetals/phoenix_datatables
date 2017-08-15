@@ -75,12 +75,4 @@ defmodule PhoenixDatatables.Request do
              length: params["length"] || 10
     }
   end
-
-  def send(queryable, _params, repo) do
-    query = from(u in queryable)
-    |> select([u], %{aac: u.aac})
-
-    repo.all(query)
-    |> Poison.encode!
-  end
 end

@@ -5,6 +5,8 @@ defmodule PhoenixDatatables.QueryTest do
   alias PhoenixDatatablesExample.Repo
   alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Factory
+  alias PhoenixDatatables.Query
+  alias PhoenixDatatables.Request
 
   @sortable [:nsn, :common_name]
 
@@ -23,6 +25,33 @@ defmodule PhoenixDatatables.QueryTest do
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
       assert item2.id == ritem2.id
+    end
+  end
+
+  describe "paginate" do
+    test "appends appropriate paginate clauses to a single-table queryable request" do
+      item = add_items()
+
+      received_params = %{
+        "_" => "1502482464715",
+        "columns" =>
+          %{
+            "0" => %{"data" => "0", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+            "1" => %{"data" => "1", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+            "2" => %{"data" => "2", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+            "3" => %{"data" => "3", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+            "4" => %{"data" => "4", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+            "5" => %{"data" => "5", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+            "6" => %{"data" => "6", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+            "7" => %{"data" => "7", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
+          },
+        "draw" => "1",
+        "length" => "10",
+        "order" => %{"0" => %{"column" => "0", "dir" => "asc"}},
+        "search" => %{"regex" => "false", "value" => ""},
+        "start" => "0"
+      } |> Poison.encode!
+      Query.paginate(Item, Request.receive(received_params))
     end
   end
 
