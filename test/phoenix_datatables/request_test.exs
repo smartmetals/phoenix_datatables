@@ -2,8 +2,6 @@ defmodule PhoenixDatatables.RequestTest do
   use ExUnit.Case
   use PhoenixDatatablesExampleWeb.ConnCase
   alias PhoenixDatatables.Request
-  alias PhoenixDatatablesExample.Repo
-  alias PhoenixDatatablesExample.Stock.Item
 
   describe "request" do
     test "receive/1 converts json params to struct form" do
@@ -47,31 +45,5 @@ defmodule PhoenixDatatables.RequestTest do
         }
       } = Request.receive(received_params_json)
     end
-<<<<<<< HEAD
-
-    test "send/2 accepts params (in struct form) and query_by_params, and returns datatables-ready data" do
-      params = %Request.Params{
-        draw: "1",
-        start: "0",
-        length: "10",
-        search: %Request.Search{regex: "false", value: ""},
-        order: [%Request.Order{column: "0", dir: "asc"}],
-        columns: %{
-          "0" => %Request.Column{data: "0", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "1" => %Request.Column{data: "1", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "2" => %Request.Column{data: "2", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "3" => %Request.Column{data: "3", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "4" => %Request.Column{data: "4", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "5" => %Request.Column{data: "5", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "6" => %Request.Column{data: "6", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "7" => %Request.Column{data: "7", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"}
-        }
-      }
-      Repo.insert %Item{aac: "AAC"}
-      Request.send(Item, params, Repo)
-      |> IO.inspect
-    end
-=======
->>>>>>> cbf5b0a... paginate started
   end
 end

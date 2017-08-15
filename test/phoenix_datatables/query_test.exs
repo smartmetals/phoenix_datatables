@@ -5,8 +5,6 @@ defmodule PhoenixDatatables.QueryTest do
   alias PhoenixDatatablesExample.Repo
   alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Factory
-  alias PhoenixDatatables.Query
-  alias PhoenixDatatables.Request
 
   @sortable [:nsn, :common_name]
 
@@ -59,8 +57,8 @@ defmodule PhoenixDatatables.QueryTest do
 
   describe "total_entries" do
     test "returns the total number of entries in the table" do
-      add_items()
-      assert Query.total_entries(Item, Repo) == 1
+      items = add_items()
+      assert Query.total_entries(Item, Repo) == length(items)
     end
   end
 
