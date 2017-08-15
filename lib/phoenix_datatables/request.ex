@@ -52,15 +52,15 @@ defmodule PhoenixDatatables.Request do
         %Order{column: val["column"], dir: val["dir"]}
       end
     columns =
-      for {_key, val} <- params["columns"] do
-        %Column{
+      Map.new (for {key, val} <- params["columns"] do
+        {key, %Column{
           data: val["data"],
           name: val["name"],
           searchable: val["searchable"],
           orderable: val["orderable"],
           search: %Search{value: val["search"]["value"], regex: val["search"]["regex"]}
-        }
-      end
+        } }
+      end)
     search =
       %Search {
         value: params["search"]["value"],
