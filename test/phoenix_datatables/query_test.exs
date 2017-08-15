@@ -1,0 +1,2 @@
+defmodule PhoenixDatatables.QueryTest
+end
