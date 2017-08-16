@@ -6,8 +6,13 @@ config :phoenix_datatables_example, PhoenixDatatablesExampleWeb.Endpoint,
   http: [port: 4001],
   server: false
 
-# Print only warnings and errors during test
-config :logger, level: :warn
+# Print only warnings and errors during test unless verbose
+if System.get_env("VERBOSE") == "true" do
+  config :logger, :console, format: "[$level] $message\n"
+else
+  config :logger, level: :warn
+end
+
 
 # Configure your database
 config :phoenix_datatables_example, PhoenixDatatablesExample.Repo,
