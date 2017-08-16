@@ -111,13 +111,13 @@ defmodule PhoenixDatatables.QueryTest do
   describe "search" do
     test "returns 1 result when 1 match found" do
       add_items()
-      received_params = Factory.raw_request
-      received_params = Map.put(
-        received_params,
+      Map.put(
+        Factory.raw_request,
         "search",
-        %{"regex" => "false", "value" => "167"}
+        %{"regex" => "false", "value" => "1NSN"}
       )
-      Query.search(Item, Request.receive(received_params))
+      |> Request.receive
+      |> Query.search(Item)
       |> Repo.all
       |> IO.inspect
     end

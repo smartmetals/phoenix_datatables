@@ -2,6 +2,7 @@ defmodule PhoenixDatatables.Query do
   import Ecto.Query
   alias Ecto.Query.JoinExpr
   alias PhoenixDatatables.Request.Params
+  alias PhoenixDatatables.Request.Search
   alias PhoenixDatatables.Query.Attribute
 
   def sort(%Params{order: order} = params, queryable) do
@@ -82,7 +83,7 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
-  # credit to the scrivener github: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
+  # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
   def total_entries(queryable, repo) do
     total_entries =
       queryable
@@ -96,10 +97,16 @@ defmodule PhoenixDatatables.Query do
     total_entries || 0
   end
 
-  def search(queryable, params) do
-    search_term = "%#{params.search.value}%"
+  def search(%Params{ search: search, columns: columns} = params, queryable) do
+    search_term = "%#{search.value}%"
+    schema = schema(queryable)
+    queryable =
+    Enum.reduce columns, queryable, fn({k, v}, queryable) ->
+      attribute = v.data |> Attribute.extract(schema)
+      IO.inspect attribute
+      queryable
+      |> or_where([u], fragment("CAST(? AS TEXT) ILIKE ?", field(u, ^attribute.name), ^search_term))
+    end
     queryable
-    |> where([u], ilike(u.id, ^search_term))
-    |> or_where([u], ilike(u.nsn, ^search_term))
   end
 end
