@@ -1,5 +1,6 @@
 defmodule PhoenixDatatables.Query do
   import Ecto.Query
+  alias Ecto.Query.JoinExpr
   alias PhoenixDatatables.Request.Params
   alias PhoenixDatatables.Query.Attribute
 
@@ -19,6 +20,13 @@ defmodule PhoenixDatatables.Query do
     queryable
     |> order_by([{^dir, ^column}])
   end
+
+  def join_order(queryable, parent) do
+    Enum.find_index(queryable.joins, &(join_relation(&1) == parent))
+  end
+
+  defp join_relation(%Ecto.Query.JoinExpr{assoc: {_, relation}}), do: relation
+  defp join_relation(join), do: raise "Cannot find schema for non-assoc join: #{inspect join}"
 
   defp schema(%Ecto.Query{} = query), do: query.from |> elem(1)
   defp schema(schema) when is_atom(schema), do: schema

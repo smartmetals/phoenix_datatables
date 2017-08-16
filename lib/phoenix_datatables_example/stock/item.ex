@@ -3,6 +3,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
   import Ecto.Changeset
   alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Stock.Category
+  alias PhoenixDatatablesExample.Stock.Unit
 
 
   schema "items" do
@@ -14,6 +15,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
     field :rep_office, :string
     field :ui, :string
     belongs_to :category, Category
+    belongs_to :unit, Unit
 
     timestamps()
   end
