@@ -1,9 +1,9 @@
 defmodule PhoenixDatatablesExampleWeb.ItemTableView do
   use PhoenixDatatablesExampleWeb, :view
-  alias PhoenixDatatables.Response
+  alias PhoenixDatatables.Response.Payload
 
   def render("index.json", %{items: items, draw: draw }) do
-    %Response {
+    %Payload {
       draw: draw,
       recordsTotal: 1,
       recordsFiltered: 1,
