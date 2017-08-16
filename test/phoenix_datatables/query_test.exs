@@ -2,8 +2,10 @@ defmodule PhoenixDatatables.QueryTest do
   use PhoenixDatatablesExample.DataCase
   alias PhoenixDatatables.Request
   alias PhoenixDatatables.Query
+  alias PhoenixDatatables.Query.Attribute
   alias PhoenixDatatablesExample.Repo
   alias PhoenixDatatablesExample.Stock.Item
+  alias PhoenixDatatablesExample.Stock.Category
   alias PhoenixDatatablesExample.Factory
 
   @sortable [:nsn, :common_name]
@@ -18,12 +20,33 @@ defmodule PhoenixDatatables.QueryTest do
       query =
         Factory.raw_request
         |> Request.receive
-        |> Query.sort(Item, @sortable)
+        |> Query.sort(Item)
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
       assert item2.id == ritem2.id
     end
+
+    # test "appends order-by clause to a joined table" do
+    #   [item1, item2] = add_items()
+
+    #   request = Factory.raw_request  # %{Factory.raw_request | "order" => %{"0" => %{"column" => "7", "dir" => "asc"}}}
+    #   query =
+    #     (from item in Item,
+    #       join: category in assoc(item, :category),
+    #       select: %{id: item.id, category_name: category.name})
+
+    #   query =
+    #     request
+    #     |> Request.receive
+    #     |> Query.sort(query)
+    #     |> IO.inspect
+
+    #   [ritem2, ritem1] = query |> Repo.all
+    #   assert item1.id == ritem1.id
+    #   assert item2.id == ritem2.id
+
+    # end
   end
 
   describe "paginate" do
@@ -55,6 +78,19 @@ defmodule PhoenixDatatables.QueryTest do
     end
   end
 
+  describe "attributes" do
+    test "can find string attributes of a an Ecto schema" do
+      %Attribute{name: name} = Attribute.extract("nsn", Item)
+      assert name == :nsn
+    end
+
+    test "can find string attributes of a related schema" do
+      %Attribute{name: name, parent: parent} = Attribute.extract("category_name", Item)
+      assert name == :name
+      assert parent == :category
+    end
+  end
+
   describe "total_entries" do
     test "returns the total number of entries in the table" do
       items = add_items()
@@ -63,8 +99,11 @@ defmodule PhoenixDatatables.QueryTest do
   end
 
   def add_items do
-    item = Factory.item
-    item2 = %{item | nsn: "1NSN"}
+    category_a = insert_category!("A")
+    category_b = insert_category!("B")
+    item = Map.put(Factory.item, :category_id, category_b.id)
+    item2 = Map.put(Factory.item, :category_id, category_a.id)
+    item2 = %{item2 | nsn: "1NSN"}
     one = insert_item! item
     two = insert_item! item2
     [one, two]
@@ -72,6 +111,11 @@ defmodule PhoenixDatatables.QueryTest do
 
   def insert_item!(item) do
     cs = Item.changeset(%Item{}, item)
+    Repo.insert!(cs)
+  end
+
+  def insert_category!(category) do
+    cs = Category.changeset(%Category{}, %{name: category})
     Repo.insert!(cs)
   end
 end

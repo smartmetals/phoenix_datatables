@@ -2,6 +2,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
   use Ecto.Schema
   import Ecto.Changeset
   alias PhoenixDatatablesExample.Stock.Item
+  alias PhoenixDatatablesExample.Stock.Category
 
 
   schema "items" do
@@ -12,6 +13,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
     field :price, :float
     field :rep_office, :string
     field :ui, :string
+    belongs_to :category, Category
 
     timestamps()
   end
