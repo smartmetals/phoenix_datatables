@@ -66,25 +66,7 @@ defmodule PhoenixDatatables.QueryTest do
 
   describe "paginate" do
     test "appends appropriate paginate clauses to a single-table queryable request" do
-      received_params = %{
-        "_" => "1502482464715",
-        "columns" =>
-          %{
-            "0" => %{"data" => "0", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-            "1" => %{"data" => "1", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-            "2" => %{"data" => "2", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-            "3" => %{"data" => "3", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-            "4" => %{"data" => "4", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-            "5" => %{"data" => "5", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-            "6" => %{"data" => "6", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-            "7" => %{"data" => "7", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
-          },
-        "draw" => "1",
-        "length" => "10",
-        "order" => %{"0" => %{"column" => "0", "dir" => "asc"}},
-        "search" => %{"regex" => "false", "value" => ""},
-        "start" => "0"
-      }
+      received_params = Factory.raw_request
       query = Query.paginate(Item, Request.receive(received_params))
       [{length, _}] = query.limit.params
       assert length == String.to_integer(received_params["length"])
@@ -113,7 +95,7 @@ defmodule PhoenixDatatables.QueryTest do
         join: category in assoc(item, :category),
         join: unit in assoc(item, :unit),
         select: %{id: item.id, category_name: category.name})
-      assert Query.join_order(Item, :query) == 0
+      assert Query.join_order(query, nil) == 0
       assert Query.join_order(query, :category) == 1
       assert Query.join_order(query, :unit) == 2
     end
@@ -123,6 +105,26 @@ defmodule PhoenixDatatables.QueryTest do
     test "returns the total number of entries in the table" do
       items = add_items()
       assert Query.total_entries(Item, Repo) == length(items)
+    end
+  end
+
+  describe "search" do
+    test "returns 1 result when 1 match found" do
+      add_items()
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id, category_name: category.name})
+      results =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        )
+        |> Request.receive
+        |> Query.search(query)
+        |> Repo.all
+      assert Enum.count(results) == 1
     end
   end
 

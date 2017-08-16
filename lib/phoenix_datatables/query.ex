@@ -17,19 +17,19 @@ defmodule PhoenixDatatables.Query do
 
   #TODO need to generate these with macros & make configurable; maybe find
   # another way entirely
-  def order_relation(queryable, 0, dir, column) do
+  defp order_relation(queryable, 0, dir, column) do
     order_by(queryable, [t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 1, dir, column) do
+  defp order_relation(queryable, 1, dir, column) do
     order_by(queryable, [_, t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 2, dir, column) do
+  defp order_relation(queryable, 2, dir, column) do
     order_by(queryable, [_, _, t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 3, dir, column) do
+  defp order_relation(queryable, 3, dir, column) do
     order_by(queryable, [_, _, _, t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 4, dir, column) do
+  defp order_relation(queryable, 4, dir, column) do
     order_by(queryable, [_, _, _, _, t], [{^dir, field(t, ^column)}])
   end
 
@@ -41,7 +41,7 @@ defmodule PhoenixDatatables.Query do
     |> order_by([{^dir, ^column}])
   end
 
-  def join_order(schema, :query) when is_atom(schema), do: 0
+  def join_order(_, nil), do: 0
   def join_order(%Ecto.Query{} = queryable, parent) do
     Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) + 1
   end
@@ -73,7 +73,16 @@ defmodule PhoenixDatatables.Query do
     |> offset(^start)
   end
 
-  # credit to the scrivener github: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
+  defp convert_to_number_if_string(num) do
+    case is_binary(num) do
+      true ->
+        {num, _} = Integer.parse(num)
+        num
+      false -> num
+    end
+  end
+
+  # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
   def total_entries(queryable, repo) do
     total_entries =
       queryable
@@ -87,12 +96,35 @@ defmodule PhoenixDatatables.Query do
     total_entries || 0
   end
 
-  defp convert_to_number_if_string(num) do
-    case is_binary(num) do
-      true ->
-        {num, _} = Integer.parse(num)
-        num
-      false -> num
+  def search(%Params{ search: search, columns: columns}, queryable) do
+    search_term = "%#{search.value}%"
+    schema = schema(queryable)
+    queryable =
+    Enum.reduce columns, queryable, fn({_, v}, acc_queryable) ->
+      attribute = v.data |> Attribute.extract(schema)
+      acc_queryable
+      |> search_relation(join_order(queryable, attribute.parent),
+                      attribute,
+                      search_term)
     end
+    queryable
+  end
+
+  #TODO need to generate these with macros & make configurable; maybe find
+  # another way entirely
+  defp search_relation(queryable, 0, attribute, search_term) do
+    or_where(queryable, [t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
+  end
+  defp search_relation(queryable, 1, attribute, search_term) do
+    or_where(queryable, [_, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
+  end
+  defp search_relation(queryable, 2, attribute, search_term) do
+    or_where(queryable, [_, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
+  end
+  defp search_relation(queryable, 3, attribute, search_term) do
+    or_where(queryable, [_, _, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
+  end
+  defp search_relation(queryable, 4, attribute, search_term) do
+    or_where(queryable, [_, _, _, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
   end
 end

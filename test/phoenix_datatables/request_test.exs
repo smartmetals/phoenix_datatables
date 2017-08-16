@@ -25,8 +25,6 @@ defmodule PhoenixDatatables.RequestTest do
         "start" => "0"
       }
 
-      received_params_json = received_params
-
       assert %Request.Params{
         draw: "1",
         start: "0",
@@ -43,7 +41,7 @@ defmodule PhoenixDatatables.RequestTest do
           "6" => %Request.Column{data: "6", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
           "7" => %Request.Column{data: "7", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"}
         }
-      } = Request.receive(received_params_json)
+      } = Request.receive(received_params)
     end
   end
 end
