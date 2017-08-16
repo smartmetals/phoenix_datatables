@@ -2,7 +2,6 @@ defmodule PhoenixDatatables.Query do
   import Ecto.Query
   alias Ecto.Query.JoinExpr
   alias PhoenixDatatables.Request.Params
-  alias PhoenixDatatables.Request.Search
   alias PhoenixDatatables.Query.Attribute
 
   def sort(%Params{order: order} = params, queryable) do
@@ -18,19 +17,19 @@ defmodule PhoenixDatatables.Query do
 
   #TODO need to generate these with macros & make configurable; maybe find
   # another way entirely
-  def order_relation(queryable, 0, dir, column) do
+  defp order_relation(queryable, 0, dir, column) do
     order_by(queryable, [t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 1, dir, column) do
+  defp order_relation(queryable, 1, dir, column) do
     order_by(queryable, [_, t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 2, dir, column) do
+  defp order_relation(queryable, 2, dir, column) do
     order_by(queryable, [_, _, t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 3, dir, column) do
+  defp order_relation(queryable, 3, dir, column) do
     order_by(queryable, [_, _, _, t], [{^dir, field(t, ^column)}])
   end
-  def order_relation(queryable, 4, dir, column) do
+  defp order_relation(queryable, 4, dir, column) do
     order_by(queryable, [_, _, _, _, t], [{^dir, field(t, ^column)}])
   end
 
@@ -42,10 +41,8 @@ defmodule PhoenixDatatables.Query do
     |> order_by([{^dir, ^column}])
   end
 
-  def join_order(schema, :query) when is_atom(schema), do: 0
+  def join_order(_, nil), do: 0
   def join_order(%Ecto.Query{} = queryable, parent) do
-    IO.inspect queryable
-    IO.inspect parent
     Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) + 1
   end
 
@@ -99,13 +96,12 @@ defmodule PhoenixDatatables.Query do
     total_entries || 0
   end
 
-  def search(%Params{ search: search, columns: columns} = params, queryable) do
+  def search(%Params{ search: search, columns: columns}, queryable) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
     queryable =
-    Enum.reduce columns, queryable, fn({k, v}, acc_queryable) ->
+    Enum.reduce columns, queryable, fn({_, v}, acc_queryable) ->
       attribute = v.data |> Attribute.extract(schema)
-      IO.inspect attribute
       acc_queryable
       |> search_relation(join_order(queryable, attribute.parent),
                       attribute,
@@ -116,19 +112,19 @@ defmodule PhoenixDatatables.Query do
 
   #TODO need to generate these with macros & make configurable; maybe find
   # another way entirely
-  def search_relation(queryable, 0, attribute, search_term) do
+  defp search_relation(queryable, 0, attribute, search_term) do
     or_where(queryable, [t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
   end
-  def search_relation(queryable, 1, attribute, search_term) do
+  defp search_relation(queryable, 1, attribute, search_term) do
     or_where(queryable, [_, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
   end
-  def search_relation(queryable, 2, attribute, search_term) do
+  defp search_relation(queryable, 2, attribute, search_term) do
     or_where(queryable, [_, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
   end
-  def search_relation(queryable, 3, attribute, search_term) do
+  defp search_relation(queryable, 3, attribute, search_term) do
     or_where(queryable, [_, _, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
   end
-  def search_relation(queryable, 4, attribute, search_term) do
+  defp search_relation(queryable, 4, attribute, search_term) do
     or_where(queryable, [_, _, _, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
   end
 end

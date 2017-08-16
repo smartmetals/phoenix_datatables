@@ -14,7 +14,7 @@ defmodule PhoenixDatatables.Query.Attribute do
       nil -> {:error, :attribute_not_found}
       {_assoc, nil} -> {:error, :attribute_not_found}
       {assoc, name} -> %__MODULE__{parent: assoc, name: name}
-      name -> %__MODULE__{parent: :query, name: name}
+      name -> %__MODULE__{parent: nil, name: name}
     end
   end
 

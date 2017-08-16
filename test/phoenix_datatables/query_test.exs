@@ -95,7 +95,7 @@ defmodule PhoenixDatatables.QueryTest do
         join: category in assoc(item, :category),
         join: unit in assoc(item, :unit),
         select: %{id: item.id, category_name: category.name})
-      assert Query.join_order(Item, :query) == 0
+      assert Query.join_order(query, nil) == 0
       assert Query.join_order(query, :category) == 1
       assert Query.join_order(query, :unit) == 2
     end
@@ -115,15 +115,16 @@ defmodule PhoenixDatatables.QueryTest do
         (from item in Item,
           join: category in assoc(item, :category),
           select: %{id: item.id, category_name: category.name})
-      Map.put(
-        Factory.raw_request,
-        "search",
-        %{"regex" => "false", "value" => "1NSN"}
-      )
-      |> Request.receive
-      |> Query.search(query)
-      |> Repo.all
-      |> IO.inspect
+      results =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        )
+        |> Request.receive
+        |> Query.search(query)
+        |> Repo.all
+      assert Enum.count(results) == 1
     end
   end
 
