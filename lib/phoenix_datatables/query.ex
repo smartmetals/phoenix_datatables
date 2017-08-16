@@ -10,7 +10,27 @@ defmodule PhoenixDatatables.Query do
     schema = schema(queryable)
     attribute = params.columns[order.column].data |> Attribute.extract(schema)
     queryable
-    |> order_by([{^dir, ^attribute.name}])
+    |> order_relation(join_order(queryable, attribute.parent),
+                      dir,
+                      attribute.name)
+  end
+
+  #TODO need to generate these with macros & make configurable; maybe find
+  # another way entirely
+  def order_relation(queryable, 0, dir, column) do
+    order_by(queryable, [t], [{^dir, field(t, ^column)}])
+  end
+  def order_relation(queryable, 1, dir, column) do
+    order_by(queryable, [_, t], [{^dir, field(t, ^column)}])
+  end
+  def order_relation(queryable, 2, dir, column) do
+    order_by(queryable, [_, _, t], [{^dir, field(t, ^column)}])
+  end
+  def order_relation(queryable, 3, dir, column) do
+    order_by(queryable, [_, _, _, t], [{^dir, field(t, ^column)}])
+  end
+  def order_relation(queryable, 4, dir, column) do
+    order_by(queryable, [_, _, _, _, t], [{^dir, field(t, ^column)}])
   end
 
   def sort(%Params{order: order} = params, queryable, sortable) do
@@ -21,11 +41,12 @@ defmodule PhoenixDatatables.Query do
     |> order_by([{^dir, ^column}])
   end
 
-  def join_order(queryable, parent) do
-    Enum.find_index(queryable.joins, &(join_relation(&1) == parent))
+  def join_order(schema, :query) when is_atom(schema), do: 0
+  def join_order(%Ecto.Query{} = queryable, parent) do
+    Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) + 1
   end
 
-  defp join_relation(%Ecto.Query.JoinExpr{assoc: {_, relation}}), do: relation
+  defp join_relation(%JoinExpr{assoc: {_, relation}}), do: relation
   defp join_relation(join), do: raise "Cannot find schema for non-assoc join: #{inspect join}"
 
   defp schema(%Ecto.Query{} = query), do: query.from |> elem(1)

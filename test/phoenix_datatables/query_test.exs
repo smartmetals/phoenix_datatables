@@ -11,6 +11,22 @@ defmodule PhoenixDatatables.QueryTest do
   @sortable [:nsn, :common_name]
 
   describe "sort" do
+    test "appends order-by clause to a single-table query specifying sortable fields" do
+      [item1, item2] = add_items()
+      assert item1.id != nil
+      assert item2.id != nil
+      assert item2.nsn < item1.nsn
+
+      query =
+        Factory.raw_request
+        |> Request.receive
+        |> Query.sort(Item, @sortable)
+
+      [ritem2, ritem1] = query |> Repo.all
+      assert item1.id == ritem1.id
+      assert item2.id == ritem2.id
+    end
+
     test "appends order-by clause to a single-table, single order_by queryable request" do
       [item1, item2] = add_items()
       assert item1.id != nil
@@ -30,7 +46,7 @@ defmodule PhoenixDatatables.QueryTest do
     test "appends order-by clause to a joined table" do
       [item1, item2] = add_items()
 
-      request = Factory.raw_request  # %{Factory.raw_request | "order" => %{"0" => %{"column" => "7", "dir" => "asc"}}}
+      request = %{Factory.raw_request | "order" => %{"0" => %{"column" => "7", "dir" => "asc"}}}
       query =
         (from item in Item,
           join: category in assoc(item, :category),
@@ -40,7 +56,6 @@ defmodule PhoenixDatatables.QueryTest do
         request
         |> Request.receive
         |> Query.sort(query)
-        |> IO.inspect
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
@@ -98,8 +113,9 @@ defmodule PhoenixDatatables.QueryTest do
         join: category in assoc(item, :category),
         join: unit in assoc(item, :unit),
         select: %{id: item.id, category_name: category.name})
-      assert Query.join_order(query, :category) == 0
-      assert Query.join_order(query, :unit) == 1
+      assert Query.join_order(Item, :query) == 0
+      assert Query.join_order(query, :category) == 1
+      assert Query.join_order(query, :unit) == 2
     end
   end
 

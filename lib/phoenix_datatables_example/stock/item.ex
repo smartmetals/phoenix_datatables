@@ -23,7 +23,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
   @doc false
   def changeset(%Item{} = item, attrs) do
     item
-    |> cast(attrs, [:nsn, :rep_office, :common_name, :description, :price, :ui, :aac])
+    |> cast(attrs, [:nsn, :rep_office, :common_name, :description, :price, :ui, :aac, :category_id])
     |> validate_required([:nsn, :rep_office, :common_name, :description, :price, :ui, :aac])
   end
 end
