@@ -1,6 +1,16 @@
 defmodule PhoenixDatatables.Query do
   import Ecto.Query
   alias PhoenixDatatables.Request.Params
+  alias PhoenixDatatables.Query.Attribute
+
+  def sort(%Params{order: order} = params, queryable) do
+    [order] = order
+    dir = cast_dir(order.dir)
+    schema = schema(queryable)
+    attribute = params.columns[order.column].data |> Attribute.extract(schema)
+    queryable
+    |> order_by([{^dir, ^attribute.name}])
+  end
 
   def sort(%Params{order: order} = params, queryable, sortable) do
     [order] = order
@@ -9,6 +19,9 @@ defmodule PhoenixDatatables.Query do
     queryable
     |> order_by([{^dir, ^column}])
   end
+
+  defp schema(%Ecto.Query{} = query), do: query.from |> elem(1)
+  defp schema(schema) when is_atom(schema), do: schema
 
   defp cast_column(column_name, sortable) do
     if column_name in Enum.map(sortable, &Atom.to_string/1) do
