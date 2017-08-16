@@ -111,20 +111,6 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
-  # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
-  def total_entries(queryable, repo) do
-    total_entries =
-      queryable
-      |> exclude(:preload)
-      |> exclude(:select)
-      |> exclude(:order_by)
-      |> subquery
-      |> select(count("*"))
-      |> repo.one
-
-    total_entries || 0
-  end
-
   def search(%Params{ search: search, columns: columns}, queryable) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)

@@ -1,6 +1,9 @@
 defmodule PhoenixDatatables.ResponseTest do
   use PhoenixDatatablesExample.DataCase
   alias PhoenixDatatables.Response
+  alias PhoenixDatatables.Request
+  alias PhoenixDatatables.Query
+  alias PhoenixDatatablesExample.Repo
   alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Stock.Category
   alias PhoenixDatatablesExample.Factory
@@ -8,9 +11,22 @@ defmodule PhoenixDatatables.ResponseTest do
   describe "send" do
     test "sends queried data in correct format" do
       add_items()
-      Item
-      |> Repo.all
-      |> IO.inspect
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id, category_name: category.name})
+      request =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        )
+        |> Request.receive
+
+      payload = request
+        |> Query.search(query)
+        |> Response.send(request.draw, Item, Repo)
+        |> IO.inspect
     end
   end
 
