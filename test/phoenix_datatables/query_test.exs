@@ -111,13 +111,17 @@ defmodule PhoenixDatatables.QueryTest do
   describe "search" do
     test "returns 1 result when 1 match found" do
       add_items()
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id, category_name: category.name})
       Map.put(
         Factory.raw_request,
         "search",
         %{"regex" => "false", "value" => "1NSN"}
       )
       |> Request.receive
-      |> Query.search(Item)
+      |> Query.search(query)
       |> Repo.all
       |> IO.inspect
     end
