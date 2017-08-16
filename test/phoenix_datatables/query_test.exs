@@ -2,6 +2,7 @@ defmodule PhoenixDatatables.QueryTest do
   use PhoenixDatatablesExample.DataCase
   alias PhoenixDatatables.Request
   alias PhoenixDatatables.Query
+  alias PhoenixDatatables.Query.Attribute
   alias PhoenixDatatablesExample.Repo
   alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Factory
@@ -52,6 +53,19 @@ defmodule PhoenixDatatables.QueryTest do
       assert length == String.to_integer(received_params["length"])
       [{offset, _}] = query.offset.params
       assert offset == String.to_integer(received_params["start"])
+    end
+  end
+
+  describe "attributes" do
+    test "can find string attributes of a an Ecto schema" do
+      %Attribute{name: name} = Attribute.extract("nsn", Item)
+      assert name == :nsn
+    end
+
+    test "can find string attributes of a related schema" do
+      %Attribute{name: name, parent: parent} = Attribute.extract("category_name", Item)
+      assert name == :name
+      assert parent == :category
     end
   end
 
