@@ -3,6 +3,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
   import Ecto.Changeset
   alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Stock.Category
+  alias PhoenixDatatablesExample.Stock.Unit
 
 
   schema "items" do
@@ -14,6 +15,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
     field :rep_office, :string
     field :ui, :string
     belongs_to :category, Category
+    belongs_to :unit, Unit
 
     timestamps()
   end
@@ -21,7 +23,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
   @doc false
   def changeset(%Item{} = item, attrs) do
     item
-    |> cast(attrs, [:nsn, :rep_office, :common_name, :description, :price, :ui, :aac])
+    |> cast(attrs, [:nsn, :rep_office, :common_name, :description, :price, :ui, :aac, :category_id])
     |> validate_required([:nsn, :rep_office, :common_name, :description, :price, :ui, :aac])
   end
 end
