@@ -68,12 +68,15 @@ defmodule PhoenixDatatables.Query do
     if parent in Enum.map(Keyword.keys(sortable), &Atom.to_string/1) do
       member = Keyword.fetch!(sortable, String.to_atom(parent))
       case member do
-        {_, children} when is_list(children) ->
-          if child in Enum.map(Keyword.keys(children), &Atom.to_string/1) do
-            case Keyword.fetch!(children, String.to_atom(child))
+        children when is_list(children) ->
+          with [child] <- child,
+                [child] <- Enum.filter(Keyword.keys(children), &(Atom.to_string(&1) == child)),
+                {:ok, order} when is_number(order) <- Keyword.fetch(children, child) do
             {child, order}
+          else
+            _ -> raise ArgumentError, "#{column_name} is not a sortable column."
           end
-        {parent, order} when is_number(order) -> {parent, order}
+        order when is_number(order) -> {parent, order}
       end
     else
       raise ArgumentError, "#{column_name} is not a sortable column."
