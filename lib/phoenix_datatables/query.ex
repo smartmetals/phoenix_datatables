@@ -73,6 +73,15 @@ defmodule PhoenixDatatables.Query do
     |> offset(^start)
   end
 
+  defp convert_to_number_if_string(num) do
+    case is_binary(num) do
+      true ->
+        {num, _} = Integer.parse(num)
+        num
+      false -> num
+    end
+  end
+
   # credit to the scrivener github: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
   def total_entries(queryable, repo) do
     total_entries =
@@ -87,12 +96,10 @@ defmodule PhoenixDatatables.Query do
     total_entries || 0
   end
 
-  defp convert_to_number_if_string(num) do
-    case is_binary(num) do
-      true ->
-        {num, _} = Integer.parse(num)
-        num
-      false -> num
-    end
+  def search(queryable, params) do
+    search_term = "%#{params.search.value}%"
+    queryable
+    |> where([u], ilike(u.id, ^search_term))
+    |> or_where([u], ilike(u.nsn, ^search_term))
   end
 end
