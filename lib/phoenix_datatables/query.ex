@@ -76,7 +76,7 @@ defmodule PhoenixDatatables.Query do
           else
             _ -> raise ArgumentError, "#{column_name} is not a sortable column."
           end
-        order when is_number(order) -> {parent, order}
+        order when is_number(order) -> {String.to_atom(parent), order}
       end
     else
       raise ArgumentError, "#{column_name} is not a sortable column."
