@@ -4,7 +4,7 @@ defmodule Seeds do
     Mix.Task.run "app.start", []
 
     Code.load_file("priv/repo/seeds_load.exs")
-    Seeds.Load.all()
+    if Mix.env == :dev, do: Seeds.Load.all()
   end
 
 end
