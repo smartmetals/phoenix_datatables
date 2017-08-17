@@ -1,0 +1,4 @@
+alias PhoenixDatatablesExample.Repo
+alias PhoenixDatatablesExample.Stock.Item
+alias PhoenixDatatablesExample.Stock.Category
+alias PhoenixDatatablesExample.Stock.Unit
