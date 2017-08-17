@@ -1,7 +1,29 @@
 defmodule PhoenixDatatablesExample.StockTest do
   use PhoenixDatatablesExample.DataCase
 
+  alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Stock
+
+  describe "seeds" do
+    test "loads specified count of nsn seeds" do
+      load_test_seeds(100)
+      assert Repo.all(Item) |> Enum.count == 100
+    end
+
+    test "loads and links items fk tables" do
+      load_test_seeds(10)
+
+      items = Repo.all(from item in Item,
+        join: category in assoc(item, :category),
+        join: unit in assoc(item, :unit),
+        select: %{id: item.id,
+                  category_name: category.name,
+                  unit_description: unit.description
+        })
+      assert Enum.count(items) == 10
+      assert List.first(items).unit_description == "Each"
+    end
+  end
 
   describe "items" do
     alias PhoenixDatatablesExample.Stock.Item
