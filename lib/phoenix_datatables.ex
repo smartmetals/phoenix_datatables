@@ -9,6 +9,6 @@ defmodule PhoenixDatatables do
   defp do_execute(query, params, repo, sortable) do
     Request.receive(params)
     |> Query.search(query)
-    |> Response.send(params["draw"], Response.total_entries(query), repo)
+    |> Response.send(params["draw"], Response.total_entries(query, repo), repo)
   end
 end

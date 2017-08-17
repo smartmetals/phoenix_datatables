@@ -1,6 +1,7 @@
 defmodule PhoenixDatatablesTest do
   use PhoenixDatatablesExample.DataCase
   alias PhoenixDatatables
+  alias PhoenixDatatables.Response.Payload
   alias PhoenixDatatablesExample.Repo
   alias PhoenixDatatablesExample.Stock.Item
   alias PhoenixDatatablesExample.Stock.Category
@@ -11,14 +12,49 @@ defmodule PhoenixDatatablesTest do
 
   describe "execute" do
     test "do all of the things in phoenix datatables" do
-      add_items()
-      query =
-        (from item in Item,
-          join: category in assoc(item, :category),
-          select: %{id: item.id, category_name: category.name})
-      PhoenixDatatables.execute(query, Factory.raw_request, Repo)
-      |> IO.inspect
+      { request, query } = create_request_and_query()
+      assert %Payload{
+        data: _data,
+        draw: _draw,
+        error: _error,
+        recordsFiltered: _recordsFiltered,
+        recordsTotal: _recordsTotal
+      } = PhoenixDatatables.execute(query, request, Repo)
     end
+
+    test "do all of the things in phoenix datatables with @sortable" do
+      { request, query } = create_request_and_query()
+      assert %Payload{
+        data: _data,
+        draw: _draw,
+        error: _error,
+        recordsFiltered: _recordsFiltered,
+        recordsTotal: _recordsTotal
+      } = PhoenixDatatables.execute(query, request, Repo, @sortable)
+    end
+
+    test "do all of the things in phoenix datatables with @sortable_join" do
+      { request, query } = create_request_and_query()
+      assert %Payload{
+        data: _data,
+        draw: _draw,
+        error: _error,
+        recordsFiltered: _recordsFiltered,
+        recordsTotal: _recordsTotal
+      } = PhoenixDatatables.execute(query, request, Repo, @sortable_join)
+    end
+  end
+
+  def create_request_and_query do
+    add_items()
+    request = Factory.raw_request
+      |> Map.put("order", %{"0" => %{"column" => "7", "dir" => "asc"}})
+      |> Map.put("search", %{"regex" => "false", "value" => "1NSN"})
+    query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name})
+    {request, query}
   end
 
   def add_items do
