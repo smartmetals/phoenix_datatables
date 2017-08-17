@@ -49,6 +49,7 @@ defmodule Seeds.NationalStockNumber do
   defp tables_to_truncate do
     ~w(
       items
+      categories
     )
   end
 
