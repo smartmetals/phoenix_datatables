@@ -125,13 +125,6 @@ defmodule PhoenixDatatables.QueryTest do
     end
   end
 
-  describe "total_entries" do
-    test "returns the total number of entries in the table" do
-      items = add_items()
-      assert Query.total_entries(Item, Repo) == length(items)
-    end
-  end
-
   describe "search" do
     test "returns 1 result when 1 match found" do
       add_items()
