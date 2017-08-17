@@ -1,5 +1,4 @@
 defmodule PhoenixDatatables.Request.Params do
-  @derive [Poison.Encoder]
   defstruct [
     :draw,
     :start,
@@ -11,7 +10,6 @@ defmodule PhoenixDatatables.Request.Params do
 end
 
 defmodule PhoenixDatatables.Request.Search do
-  @derive [Poison.Encoder]
   defstruct [
     :value,
     :regex
@@ -19,7 +17,6 @@ defmodule PhoenixDatatables.Request.Search do
 end
 
 defmodule PhoenixDatatables.Request.Order do
-  @derive [Poison.Encoder]
   defstruct [
     :column,
     :dir
@@ -27,7 +24,6 @@ defmodule PhoenixDatatables.Request.Order do
 end
 
 defmodule PhoenixDatatables.Request.Column do
-  @derive [Poison.Encoder]
   defstruct [
     :data,
     :name,
