@@ -9,12 +9,12 @@ defmodule PhoenixDatatables.ResponseTest do
   alias PhoenixDatatablesExample.Factory
 
   describe "send" do
-    test "sends queried data in correct format" do
+    test "returns queried data in correct format" do
       add_items()
       query =
         (from item in Item,
           join: category in assoc(item, :category),
-          select: %{id: item.id, category_name: category.name})
+          select: %{id: item.id, category_name: category.name, nsn: item.nsn})
       request =
         Map.put(
           Factory.raw_request,
@@ -22,11 +22,13 @@ defmodule PhoenixDatatables.ResponseTest do
           %{"regex" => "false", "value" => "1NSN"}
         )
         |> Request.receive
+      search_results = Query.search(request, query)
+      payload = Response.send(search_results, request.draw, Item, Repo)
 
-      payload = request
-        |> Query.search(query)
-        |> Response.send(request.draw, Item, Repo)
-        |> IO.inspect
+      assert payload.draw == request.draw
+      assert payload.recordsFiltered == length(Repo.all(search_results))
+      assert payload.recordsTotal == length(Repo.all(Item))
+      assert payload.data == Repo.all(search_results)
     end
   end
 
