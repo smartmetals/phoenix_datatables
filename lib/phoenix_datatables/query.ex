@@ -15,6 +15,14 @@ defmodule PhoenixDatatables.Query do
                       attribute.name)
   end
 
+  def sort(%Params{order: order} = params, queryable, sortable) do
+    [order] = order
+    dir = cast_dir(order.dir)
+    {column, join_index} = params.columns[order.column].data |> cast_column(sortable)
+    queryable
+    |> order_relation(join_index, dir, column)
+  end
+
   #TODO need to generate these with macros & make configurable; maybe find
   # another way entirely
   defp order_relation(queryable, 0, dir, column) do
@@ -52,11 +60,32 @@ defmodule PhoenixDatatables.Query do
   defp schema(%Ecto.Query{} = query), do: query.from |> elem(1)
   defp schema(schema) when is_atom(schema), do: schema
 
-  defp cast_column(column_name, sortable) do
-    if column_name in Enum.map(sortable, &Atom.to_string/1) do
-      String.to_atom(column_name)
+  defp cast_column(column_name, sortable)
+    when is_list(sortable)
+         and is_tuple(hd(sortable))
+         and is_atom(elem(hd(sortable), 0)) do #Keyword
+      [parent | child] = String.split(column_name, "_")
+    if parent in Enum.map(Keyword.keys(sortable), &Atom.to_string/1) do
+      member = Keyword.fetch!(sortable, String.to_atom(parent))
+      case member do
+        children when is_list(children) ->
+          with [child] <- child,
+                [child] <- Enum.filter(Keyword.keys(children), &(Atom.to_string(&1) == child)),
+                {:ok, order} when is_number(order) <- Keyword.fetch(children, child) do
+            {child, order}
+          else
+            _ -> raise ArgumentError, "#{column_name} is not a sortable column."
+          end
+        order when is_number(order) -> {String.to_atom(parent), order}
+      end
     else
       raise ArgumentError, "#{column_name} is not a sortable column."
+    end
+  end
+
+  defp cast_column(column_name, sortable) do
+    if column_name in Enum.map(sortable, &Atom.to_string/1) do
+      {String.to_atom(column_name), 0}
     end
   end
 
