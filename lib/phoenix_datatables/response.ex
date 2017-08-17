@@ -7,11 +7,10 @@ defmodule PhoenixDatatables.Response do
 
   alias PhoenixDatatables.Response.Payload
 
-  def send(query, draw, queryable, repo) do
-    data = repo.all(query)
+  def send(query, draw, total_entries, repo) do
     %Payload {
       draw: draw,
-      recordsTotal: total_entries(queryable, repo),
+      recordsTotal: total_entries,
       recordsFiltered: total_entries(query, repo),
       data: repo.all(query),
       error: nil
@@ -19,7 +18,7 @@ defmodule PhoenixDatatables.Response do
   end
 
   # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
-  defp total_entries(queryable, repo) do
+  def total_entries(queryable, repo) do
     total_entries =
       queryable
       |> exclude(:preload)

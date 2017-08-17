@@ -23,12 +23,28 @@ defmodule PhoenixDatatables.ResponseTest do
         )
         |> Request.receive
       search_results = Query.search(request, query)
-      payload = Response.send(search_results, request.draw, Item, Repo)
+      payload = Response.send(search_results, request.draw, Response.total_entries(Item, Repo), Repo)
 
       assert payload.draw == request.draw
       assert payload.recordsFiltered == length(Repo.all(search_results))
       assert payload.recordsTotal == length(Repo.all(Item))
       assert payload.data == Repo.all(search_results)
+    end
+  end
+
+  describe "total_entries" do
+    test "returns number of results in specified schema" do
+      add_items()
+      assert Response.total_entries(Item, Repo) == length(Repo.all(Item))
+    end
+
+    test "returns number of results in a query" do
+      add_items()
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id})
+      assert Response.total_entries(query, Repo) == length(Repo.all(Item))
     end
   end
 
