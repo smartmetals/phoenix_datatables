@@ -88,19 +88,16 @@ defmodule PhoenixDatatables.QueryTest do
     end
 
     test "appends multiple order-by clause to a table" do
-      load_test_seeds(10)
-
       orderings = %{"0" => %{"column" => "1", "dir" => "asc"},
                     "1" => %{"column" => "2", "dir" => "asc"}}
       request = %{Factory.raw_request | "order" => orderings}
 
-      items =
+      query =
         request
         |> Request.receive
         |> Query.sort(Item)
-        |> Repo.all
 
-      assert List.first(items).nsn == "3510-00-273-9738"
+      assert query.order_bys |> Enum.count == 2
     end
 
     test "appends multiple order-by clause to a joined query" do
@@ -123,6 +120,8 @@ defmodule PhoenixDatatables.QueryTest do
         request
         |> Request.receive
         |> Query.sort(query)
+
+      assert query.order_bys |> Enum.count == 2
 
       [ritem1, ritem2, ritem3 | _] = query |> Repo.all
       assert ritem1.unit_description == "Dozen"
