@@ -149,7 +149,7 @@ defmodule PhoenixDatatables.QueryTest do
     end
 
     test "can find string attributes of a related schema" do
-      %Attribute{name: name, parent: parent} = Attribute.extract("category_name", Item)
+      %Attribute{name: name, parent: parent} = Attribute.extract("category.name", Item)
       assert name == :name
       assert parent == :category
     end

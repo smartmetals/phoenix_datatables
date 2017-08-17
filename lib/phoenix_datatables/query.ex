@@ -70,7 +70,7 @@ defmodule PhoenixDatatables.Query do
     when is_list(sortable)
          and is_tuple(hd(sortable))
          and is_atom(elem(hd(sortable), 0)) do #Keyword
-      [parent | child] = String.split(column_name, "_")
+      [parent | child] = String.split(column_name, ".")
     if parent in Enum.map(Keyword.keys(sortable), &Atom.to_string/1) do
       member = Keyword.fetch!(sortable, String.to_atom(parent))
       case member do

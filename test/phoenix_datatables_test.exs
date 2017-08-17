@@ -8,7 +8,7 @@ defmodule PhoenixDatatablesTest do
   alias PhoenixDatatablesExample.Factory
 
   @sortable [:nsn, :common_name]
-  @sortable_join [nsn: 0, category: [name: 1]]
+  @sortable_join [nsn: 0, common_name: 0, category: [name: 1]]
 
   describe "execute" do
     test "do all of the things in phoenix datatables" do
@@ -51,7 +51,7 @@ defmodule PhoenixDatatablesTest do
   def create_request_and_query do
     add_items()
     request = Factory.raw_request
-      |> Map.put("order", %{"0" => %{"column" => "7", "dir" => "asc"}})
+      |> Map.put("order", %{"0" => %{"column" => "2", "dir" => "asc"}})
       |> Map.put("search", %{"regex" => "false", "value" => "1NSN"})
     query =
       (from item in Item,
