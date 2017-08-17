@@ -4,15 +4,16 @@ defmodule PhoenixDatatables.Query do
   alias PhoenixDatatables.Request.Params
   alias PhoenixDatatables.Query.Attribute
 
-  def sort(%Params{order: order} = params, queryable) do
-    [order] = order
-    dir = cast_dir(order.dir)
+  def sort(%Params{order: orders} = params, queryable) do
     schema = schema(queryable)
-    attribute = params.columns[order.column].data |> Attribute.extract(schema)
-    queryable
-    |> order_relation(join_order(queryable, attribute.parent),
-                      dir,
-                      attribute.name)
+    orders =
+      for order <- orders do
+        dir = cast_dir(order.dir)
+        attribute = params.columns[order.column].data |> Attribute.extract(schema)
+        join_index = join_order(queryable, attribute.parent)
+        {dir, attribute.name, join_index}
+      end
+    do_sorts(queryable, orders)
   end
 
   def sort(%Params{order: order} = params, queryable, sortable) do
@@ -23,8 +24,15 @@ defmodule PhoenixDatatables.Query do
     |> order_relation(join_index, dir, column)
   end
 
+  def do_sorts(queryable, sorts) do
+    Enum.reduce(sorts, queryable, fn {dir, column, join_index}, queryable ->
+      order_relation(queryable, join_index, dir, column)
+    end)
+  end
+
   #TODO need to generate these with macros & make configurable; maybe find
   # another way entirely
+  defp order_relation(queryable, nil, _, _), do: queryable
   defp order_relation(queryable, 0, dir, column) do
     order_by(queryable, [t], [{^dir, field(t, ^column)}])
   end
@@ -41,17 +49,13 @@ defmodule PhoenixDatatables.Query do
     order_by(queryable, [_, _, _, _, t], [{^dir, field(t, ^column)}])
   end
 
-  def sort(%Params{order: order} = params, queryable, sortable) do
-    [order] = order
-    dir = cast_dir(order.dir)
-    column = params.columns[order.column].data |> cast_column(sortable)
-    queryable
-    |> order_by([{^dir, ^column}])
-  end
-
   def join_order(_, nil), do: 0
   def join_order(%Ecto.Query{} = queryable, parent) do
-    Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) + 1
+    case Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) do
+      nil -> nil
+      number when is_number(number) -> number + 1
+      _ -> raise "impossiblity in join_order with #{inspect queryable} and #{parent}"
+    end
   end
 
   defp join_relation(%JoinExpr{assoc: {_, relation}}), do: relation
@@ -141,6 +145,7 @@ defmodule PhoenixDatatables.Query do
 
   #TODO need to generate these with macros & make configurable; maybe find
   # another way entirely
+  defp search_relation(queryable, nil, _, _), do: queryable
   defp search_relation(queryable, 0, attribute, search_term) do
     or_where(queryable, [t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute.name), ^search_term))
   end
