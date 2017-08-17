@@ -9,6 +9,7 @@ defmodule PhoenixDatatables.QueryTest do
   alias PhoenixDatatablesExample.Factory
 
   @sortable [:nsn, :common_name]
+  @sortable_join [nsn: 0, category: [name: 1]]
 
   describe "sort" do
     test "appends order-by clause to a single-table query specifying sortable fields" do
@@ -41,6 +42,29 @@ defmodule PhoenixDatatables.QueryTest do
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
       assert item2.id == ritem2.id
+    end
+
+    test "appends order-by clause to a join query specifying sortable fields & orders" do
+      [item1, item2] = add_items()
+
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name})
+
+      do_test = fn request ->
+        query =
+          request
+          |> Request.receive
+          |> Query.sort(query, @sortable_join)
+
+        [ritem2, ritem1] = query |> Repo.all
+        assert item1.id == ritem1.id
+        assert item2.id == ritem2.id
+      end
+
+      do_test.(Factory.raw_request)
+      do_test.(%{Factory.raw_request | "order" => %{"0" => %{"column" => "7", "dir" => "asc"}}})
     end
 
     test "appends order-by clause to a joined table" do
