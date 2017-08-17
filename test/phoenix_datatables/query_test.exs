@@ -86,6 +86,50 @@ defmodule PhoenixDatatables.QueryTest do
       assert item2.id == ritem2.id
 
     end
+
+    test "appends multiple order-by clause to a table" do
+      load_test_seeds(10)
+
+      orderings = %{"0" => %{"column" => "1", "dir" => "asc"},
+                    "1" => %{"column" => "2", "dir" => "asc"}}
+      request = %{Factory.raw_request | "order" => orderings}
+
+      items =
+        request
+        |> Request.receive
+        |> Query.sort(Item)
+        |> Repo.all
+
+      assert List.first(items).nsn == "3510-00-273-9738"
+    end
+
+    test "appends multiple order-by clause to a joined query" do
+      load_test_seeds(10)
+
+      orderings = %{"0" => %{"column" => "7", "dir" => "asc"},
+                    "1" => %{"column" => "8", "dir" => "asc"}}
+
+      request = %{Factory.raw_request | "order" => orderings}
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          join: unit in assoc(item, :unit),
+          select: %{id: item.id,
+                    category_name: category.name,
+                    unit_description: unit.description
+        })
+
+      query =
+        request
+        |> Request.receive
+        |> Query.sort(query)
+
+      [ritem1, ritem2, ritem3 | _] = query |> Repo.all
+      assert ritem1.unit_description == "Dozen"
+      assert ritem2.unit_description == "Dozen"
+      assert ritem3.unit_description == "Each"
+    end
+
   end
 
   describe "paginate" do
