@@ -15,33 +15,36 @@ defmodule PhoenixDatatablesTest do
       { request, query } = create_request_and_query()
       assert %Payload{
         data: _data,
-        draw: _draw,
+        draw: draw,
         error: _error,
         recordsFiltered: _recordsFiltered,
         recordsTotal: _recordsTotal
       } = PhoenixDatatables.execute(query, request, Repo)
+      assert draw == request["draw"]
     end
 
     test "do all of the things in phoenix datatables with @sortable" do
       { request, query } = create_request_and_query()
       assert %Payload{
         data: _data,
-        draw: _draw,
+        draw: draw,
         error: _error,
         recordsFiltered: _recordsFiltered,
         recordsTotal: _recordsTotal
       } = PhoenixDatatables.execute(query, request, Repo, @sortable)
+      assert draw == request["draw"]
     end
 
     test "do all of the things in phoenix datatables with @sortable_join" do
       { request, query } = create_request_and_query()
       assert %Payload{
         data: _data,
-        draw: _draw,
+        draw: draw,
         error: _error,
         recordsFiltered: _recordsFiltered,
         recordsTotal: _recordsTotal
       } = PhoenixDatatables.execute(query, request, Repo, @sortable_join)
+      assert draw == request["draw"]
     end
   end
 

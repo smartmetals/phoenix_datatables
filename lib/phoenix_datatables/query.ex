@@ -4,24 +4,26 @@ defmodule PhoenixDatatables.Query do
   alias PhoenixDatatables.Request.Params
   alias PhoenixDatatables.Query.Attribute
 
-  def sort(%Params{order: orders} = params, queryable) do
+  def sort(params, queryable, sortable \\ nil)
+  def sort(%Params{order: orders} = params, queryable, sortable) when is_list(sortable) do
+    sorts =
+      for order <- orders do
+        dir = cast_dir(order.dir)
+        {column, join_index} = params.columns[order.column].data |> cast_column(sortable)
+        {dir, column, join_index}
+      end
+    do_sorts(queryable, sorts)
+  end
+  def sort(%Params{order: orders} = params, queryable, _sortable) do
     schema = schema(queryable)
-    orders =
+    sorts =
       for order <- orders do
         dir = cast_dir(order.dir)
         attribute = params.columns[order.column].data |> Attribute.extract(schema)
         join_index = join_order(queryable, attribute.parent)
         {dir, attribute.name, join_index}
       end
-    do_sorts(queryable, orders)
-  end
-
-  def sort(%Params{order: order} = params, queryable, sortable) do
-    [order] = order
-    dir = cast_dir(order.dir)
-    {column, join_index} = params.columns[order.column].data |> cast_column(sortable)
-    queryable
-    |> order_relation(join_index, dir, column)
+    do_sorts(queryable, sorts)
   end
 
   def do_sorts(queryable, sorts) do
@@ -115,7 +117,7 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
-  def search(%Params{ search: search, columns: columns}, queryable) do
+  def search(queryable, %Params{ search: search, columns: columns}) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
     queryable =

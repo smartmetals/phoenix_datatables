@@ -175,14 +175,13 @@ defmodule PhoenixDatatables.QueryTest do
         (from item in Item,
           join: category in assoc(item, :category),
           select: %{id: item.id, category_name: category.name})
-      results =
+      params =
         Map.put(
           Factory.raw_request,
           "search",
           %{"regex" => "false", "value" => "1NSN"}
-        )
-        |> Request.receive
-        |> Query.search(query)
+        ) |> Request.receive
+      results = Query.search(query, params)
         |> Repo.all
       assert Enum.count(results) == 1
     end

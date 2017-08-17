@@ -22,7 +22,7 @@ defmodule PhoenixDatatables.ResponseTest do
           %{"regex" => "false", "value" => "1NSN"}
         )
         |> Request.receive
-      search_results = Query.search(request, query)
+      search_results = Query.search(query, request)
       payload = Response.send(search_results, request.draw, Response.total_entries(Item, Repo), Repo)
 
       assert payload.draw == request.draw
