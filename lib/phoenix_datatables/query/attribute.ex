@@ -23,7 +23,7 @@ defmodule PhoenixDatatables.Query.Attribute do
       nil ->
         nil
       assoc ->
-        key = String.replace_prefix(key, "#{assoc}_", "")
+        key = String.replace_prefix(key, "#{assoc}.", "")
         {assoc, get_name(module.__schema__(:association, assoc), key)}
     end
   end
