@@ -32,14 +32,14 @@ defmodule PhoenixDatatables.RequestTest do
         search: %Request.Search{regex: "false", value: ""},
         order: [%Request.Order{column: "0", dir: "asc"}],
         columns: %{
-          "0" => %Request.Column{data: "0", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "1" => %Request.Column{data: "1", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "2" => %Request.Column{data: "2", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "3" => %Request.Column{data: "3", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "4" => %Request.Column{data: "4", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "5" => %Request.Column{data: "5", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "6" => %Request.Column{data: "6", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"},
-          "7" => %Request.Column{data: "7", name: "", orderable: "true", search: %Request.Search{regex: "false", value: ""}, searchable: "true"}
+          "0" => %Request.Column{data: "0", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true},
+          "1" => %Request.Column{data: "1", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true},
+          "2" => %Request.Column{data: "2", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true},
+          "3" => %Request.Column{data: "3", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true},
+          "4" => %Request.Column{data: "4", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true},
+          "5" => %Request.Column{data: "5", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true},
+          "6" => %Request.Column{data: "6", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true},
+          "7" => %Request.Column{data: "7", name: "", orderable: true, search: %Request.Search{regex: "false", value: ""}, searchable: true}
         }
       } = Request.receive(received_params)
     end

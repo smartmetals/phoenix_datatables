@@ -50,8 +50,8 @@ defmodule PhoenixDatatables.Request do
         {key, %Column{
           data: val["data"],
           name: val["name"],
-          searchable: val["searchable"],
-          orderable: val["orderable"],
+          searchable: val["searchable"] == "true",
+          orderable: val["orderable"] == "true",
           search: %Search{value: val["search"]["value"], regex: val["search"]["regex"]}
         } }
       end)

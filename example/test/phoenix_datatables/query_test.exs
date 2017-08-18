@@ -185,6 +185,26 @@ defmodule PhoenixDatatables.QueryTest do
         |> Repo.all
       assert Enum.count(results) == 1
     end
+
+    test "will only search in searchable fields when those are specified" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name})
+      params =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        ) |> Request.receive
+      results =
+        Query.search(query, params, [:nsn])
+        |> Repo.all
+
+      assert Enum.count(results) == 1
+    end
+
   end
 
   def add_items do
