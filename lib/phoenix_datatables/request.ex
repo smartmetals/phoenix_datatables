@@ -43,8 +43,6 @@ defmodule PhoenixDatatables.Request do
   alias PhoenixDatatables.Request.Order
   alias PhoenixDatatables.Request.Column
 
-  import Ecto.Query
-
   def receive(params) do
 
     orders =

@@ -23,8 +23,8 @@ defmodule PhoenixDatatablesExample.Factory do
           "4" => %{"data" => "price", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "5" => %{"data" => "ui", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "6" => %{"data" => "aac", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-          "7" => %{"data" => "category_name", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-          "8" => %{"data" => "unit_description", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
+          "7" => %{"data" => "category.name", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+          "8" => %{"data" => "unit.description", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
         },
       "draw" => "1",
       "length" => "10",
