@@ -2,6 +2,7 @@ defmodule PhoenixDatatables.Query do
   import Ecto.Query
   alias Ecto.Query.JoinExpr
   alias PhoenixDatatables.Request.Params
+  alias PhoenixDatatables.Request.Search
   alias PhoenixDatatables.Query.Attribute
 
   def sort(params, queryable, sortable \\ nil)
@@ -13,7 +14,6 @@ defmodule PhoenixDatatables.Query do
         {dir, column, join_index}
       end
     do_sorts(queryable, sorts)
-  end
   def sort(%Params{order: orders} = params, queryable, _sortable) do
     schema = schema(queryable)
     sorts =
@@ -117,6 +117,7 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
+  def search(queryable, %Params{search: %Search{value: ""}}), do: queryable
   def search(queryable, %Params{ search: search, columns: columns}) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
