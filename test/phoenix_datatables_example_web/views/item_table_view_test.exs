@@ -1,9 +1,5 @@
 defmodule PhoenixDatatablesExampleWeb.ItemTableViewTest do
   use ExUnit.Case
-  alias PhoenixDatatablesExampleWeb.ItemTableView
-  alias PhoenixDatatablesExample.Factory
-
-  @items [Factory.item]
 
   describe "render" do
     test "sets draw parameter based on request" do
