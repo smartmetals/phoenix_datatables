@@ -11,6 +11,7 @@ defmodule PhoenixDatatables do
     params
     |> Query.sort(query, sortable)
     |> Query.search(params)
+    |> Query.paginate(params)
     |> Response.send(params.draw, Response.total_entries(query, repo), repo)
   end
 end
