@@ -43,8 +43,17 @@ defmodule PhoenixDatatables.ResponseTest do
       query =
         (from item in Item,
           join: category in assoc(item, :category),
-          select: %{id: item.id})
-      assert Response.total_entries(query, Repo) == length(Repo.all(Item))
+          select: %{id: item.id}
+        )
+      request =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        )
+        |> Request.receive
+      search_results = Query.search(query, request)
+      assert Response.total_entries(search_results, Repo) == 1
     end
   end
 

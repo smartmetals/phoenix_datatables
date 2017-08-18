@@ -24,6 +24,8 @@ defmodule PhoenixDatatables.Response do
       |> exclude(:preload)
       |> exclude(:select)
       |> exclude(:order_by)
+      |> exclude(:limit)
+      |> exclude(:offset)
       |> subquery
       |> select(count("*"))
       |> repo.one
