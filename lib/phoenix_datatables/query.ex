@@ -14,6 +14,7 @@ defmodule PhoenixDatatables.Query do
         {dir, column, join_index}
       end
     do_sorts(queryable, sorts)
+  end
   def sort(%Params{order: orders} = params, queryable, _sortable) do
     schema = schema(queryable)
     sorts =
