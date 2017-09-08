@@ -8,6 +8,10 @@ defmodule PhoenixDatatablesExample.Stock do
 
   alias PhoenixDatatablesExample.Stock.Item
 
+  def items_datatable(params) do
+    PhoenixDatatables.execute(Item, params, Repo)
+  end
+
   @doc """
   Returns the list of items.
 
