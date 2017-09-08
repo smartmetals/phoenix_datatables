@@ -1,6 +1,5 @@
 defmodule PhoenixDatatablesExampleWeb.ItemTableController do
   use PhoenixDatatablesExampleWeb, :controller
-  alias PhoenixDatatables
   alias PhoenixDatatablesExample.Stock
 
   action_fallback PhoenixDatatablesExampleWeb.FallbackController
@@ -8,5 +7,4 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableController do
   def index(conn, params) do
     render(conn, :index, payload: Stock.items_datatable(params))
   end
-
 end
