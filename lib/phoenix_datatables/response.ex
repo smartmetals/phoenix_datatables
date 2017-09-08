@@ -1,5 +1,7 @@
 defmodule PhoenixDatatables.Response.Payload do
   defstruct draw: 0, recordsTotal: 0, recordsFiltered: 0, data: [%{}], error: nil
+
+  @type t :: %__MODULE__{}
 end
 
 defmodule PhoenixDatatables.Response do

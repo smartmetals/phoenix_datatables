@@ -7,6 +7,7 @@ defmodule PhoenixDatatables.Request.Params do
     :order,
     :columns
   ]
+  @type t :: %__MODULE__{}
 end
 
 defmodule PhoenixDatatables.Request.Search do

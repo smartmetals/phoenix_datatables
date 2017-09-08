@@ -46,7 +46,6 @@ defmodule PhoenixDatatables.Query do
     case Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) do
       nil -> nil
       number when is_number(number) -> number + 1
-      _ -> raise "impossiblity in join_order with #{inspect queryable} and #{parent}"
     end
   end
 
