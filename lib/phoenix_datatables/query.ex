@@ -1,5 +1,6 @@
 defmodule PhoenixDatatables.Query do
   import Ecto.Query
+  use PhoenixDatatables.Query.Macros
   alias Ecto.Query.JoinExpr
   alias PhoenixDatatables.Request.Params
   alias PhoenixDatatables.Request.Column
@@ -38,25 +39,6 @@ defmodule PhoenixDatatables.Query do
     Enum.reduce(sorts, queryable, fn {dir, column, join_index}, queryable ->
       order_relation(queryable, join_index, dir, column)
     end)
-  end
-
-  #TODO need to generate these with macros & make configurable; maybe find
-  # another way entirely
-  defp order_relation(queryable, nil, _, _), do: queryable
-  defp order_relation(queryable, 0, dir, column) do
-    order_by(queryable, [t], [{^dir, field(t, ^column)}])
-  end
-  defp order_relation(queryable, 1, dir, column) do
-    order_by(queryable, [_, t], [{^dir, field(t, ^column)}])
-  end
-  defp order_relation(queryable, 2, dir, column) do
-    order_by(queryable, [_, _, t], [{^dir, field(t, ^column)}])
-  end
-  defp order_relation(queryable, 3, dir, column) do
-    order_by(queryable, [_, _, _, t], [{^dir, field(t, ^column)}])
-  end
-  defp order_relation(queryable, 4, dir, column) do
-    order_by(queryable, [_, _, _, _, t], [{^dir, field(t, ^column)}])
   end
 
   def join_order(_, nil), do: 0
@@ -156,24 +138,5 @@ defmodule PhoenixDatatables.Query do
         _ -> acc_queryable
       end
     end
-  end
-
-  #TODO need to generate these with macros & make configurable; maybe find
-  # another way entirely
-  defp search_relation(queryable, nil, _, _), do: queryable
-  defp search_relation(queryable, 0, attribute, search_term) do
-    or_where(queryable, [t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute), ^search_term))
-  end
-  defp search_relation(queryable, 1, attribute, search_term) do
-    or_where(queryable, [_, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute), ^search_term))
-  end
-  defp search_relation(queryable, 2, attribute, search_term) do
-    or_where(queryable, [_, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute), ^search_term))
-  end
-  defp search_relation(queryable, 3, attribute, search_term) do
-    or_where(queryable, [_, _, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute), ^search_term))
-  end
-  defp search_relation(queryable, 4, attribute, search_term) do
-    or_where(queryable, [_, _, _, _, t], fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute), ^search_term))
   end
 end
