@@ -207,6 +207,31 @@ defmodule PhoenixDatatables.QueryTest do
 
   end
 
+  describe "total_entries" do
+    test "returns number of results in specified schema" do
+      add_items()
+      assert Query.total_entries(Item, Repo) == length(Repo.all(Item))
+    end
+
+    test "returns number of results in a query" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id}
+      )
+      request =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        )
+        |> Request.receive
+      search_results = Query.search(query, request)
+      assert Query.total_entries(search_results, Repo) == 1
+    end
+  end
+
   def add_items do
     category_a = insert_category!("A")
     category_b = insert_category!("B")

@@ -3,33 +3,15 @@ defmodule PhoenixDatatables.Response.Payload do
 end
 
 defmodule PhoenixDatatables.Response do
-  import Ecto.Query
-
   alias PhoenixDatatables.Response.Payload
 
-  def send(query, draw, total_entries, repo) do
+  def new(data, draw, total_entries, filtered_entries) do
     %Payload {
       draw: draw,
       recordsTotal: total_entries,
-      recordsFiltered: total_entries(query, repo),
-      data: repo.all(query),
+      recordsFiltered:  filtered_entries,
+      data: data,
       error: nil
     }
-  end
-
-  # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
-  def total_entries(queryable, repo) do
-    total_entries =
-      queryable
-      |> exclude(:preload)
-      |> exclude(:select)
-      |> exclude(:order_by)
-      |> exclude(:limit)
-      |> exclude(:offset)
-      |> subquery
-      |> select(count("*"))
-      |> repo.one
-
-    total_entries || 0
   end
 end

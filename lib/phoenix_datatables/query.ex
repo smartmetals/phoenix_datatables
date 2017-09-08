@@ -139,4 +139,20 @@ defmodule PhoenixDatatables.Query do
       end
     end
   end
+
+  # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
+  def total_entries(queryable, repo) do
+    total_entries =
+      queryable
+      |> exclude(:preload)
+      |> exclude(:select)
+      |> exclude(:order_by)
+      |> exclude(:limit)
+      |> exclude(:offset)
+      |> subquery
+      |> select(count("*"))
+      |> repo.one
+
+    total_entries || 0
+  end
 end
