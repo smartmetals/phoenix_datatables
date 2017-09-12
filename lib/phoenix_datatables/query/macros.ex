@@ -1,11 +1,14 @@
 defmodule PhoenixDatatables.Query.Macros do
   @moduledoc false
 
+  # make a simple AST representing blank Ecto table bindings so that
+  # 'name' is bound to num(th) position (0 base)
+  # e.g. bind_number(3, :t) = [_, _, _, t]
   defp bind_number(num, name \\ :t) do
     blanks =
-    for _ <- 0..num do
-      {:_, [], Elixir}
-    end
+      for _ <- 0..num do
+        {:_, [], Elixir}
+      end
     Enum.drop(blanks, 1) ++ [{name, [], Elixir}]
   end
 
@@ -15,12 +18,6 @@ defmodule PhoenixDatatables.Query.Macros do
       defp order_relation(queryable, unquote(num), dir, column) do
         order_by(queryable, unquote(bindings), [{^dir, field(t, ^column)}])
       end
-    end
-  end
-
-  defp def_order_relations(defines_count) do
-    for n <- 0..defines_count do
-      def_order_relation(n)
     end
   end
 
@@ -35,12 +32,6 @@ defmodule PhoenixDatatables.Query.Macros do
     end
   end
 
-  defp def_search_relations(defines_count) do
-    for n <- 0..defines_count do
-      def_search_relation(n)
-    end
-  end
-
   defmacro __using__(arg) do
     defines_count = case arg do
                       [] -> 25
@@ -51,10 +42,10 @@ defmodule PhoenixDatatables.Query.Macros do
                                 provide a number or nothing"
                               """
                     end
-    order_relations = def_order_relations(defines_count)
-    search_relations = def_search_relations(defines_count)
+    order_relations = Enum.map(0..defines_count, &def_order_relation/1)
+    search_relations = Enum.map(0..defines_count, &def_search_relation/1)
+
     quote do
-      import PhoenixDatatables.Query.Macros
       unquote(order_relations)
       defp search_relation(queryable, nil, _, _), do: queryable
       unquote(search_relations)
