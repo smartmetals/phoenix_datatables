@@ -18,8 +18,6 @@ end
 
 defmodule PhoenixDatatables.Fixtures.Stock.Category do
   use Ecto.Schema
-  import Ecto.Changeset
-  alias PhoenixDatatables.Fixtures.Stock.Category
   alias PhoenixDatatables.Fixtures.Stock.Item
 
   schema "categories" do
@@ -30,8 +28,6 @@ end
 
 defmodule PhoenixDatatables.Fixtures.Stock.Unit do
   use Ecto.Schema
-  import Ecto.Changeset
-  alias PhoenixDatatables.Fixtures.Stock.Category
   alias PhoenixDatatables.Fixtures.Stock.Item
 
   schema "units" do

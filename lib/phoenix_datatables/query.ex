@@ -123,17 +123,17 @@ defmodule PhoenixDatatables.Query do
 
   def search(queryable, params, options \\ []) do
     case queryable do
-      %Ecto.Query{} = queryable ->
-        if queryable.wheres do
-          QueryException.raise(:search, """
-            Search contained a top-level where clause, which is not permitted.
-            Instead, pass your where clause wrapped with Ecto.Query.dynamic e.g.
+      %Ecto.Query{wheres: list} when is_list(list) and length(list) > 0 ->
+        QueryException.raise(:search, """
+          Search contained a top-level where clause, which is not permitted.
+          Instead, pass your where clause wrapped with Ecto.Query.dynamic e.g.
 
-              search(queryable, params, where: dynamic([t], t.color == "blue"))
+            search(queryable, params, where: dynamic([t], t.color == "blue"))
 
-            https://hexdocs.pm/ecto/Ecto.Query.html#dynamic/2
-          """)
-        end
+          where clause we found: {inspect list}
+
+          https://hexdocs.pm/ecto/Ecto.Query.html#dynamic/2
+        """)
        _schema -> nil
     end
     dynamic_where = options[:where]
