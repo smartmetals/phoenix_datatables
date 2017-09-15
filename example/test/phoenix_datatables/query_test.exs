@@ -169,6 +169,7 @@ defmodule PhoenixDatatables.QueryTest do
   end
 
   describe "search" do
+
     test "returns 1 result when 1 match found" do
       add_items()
       query =
