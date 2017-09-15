@@ -1,4 +1,7 @@
 defmodule PhoenixDatatables.Repo do
+  @moduledoc """
+  Provides a using macro which creates the fetch table function
+  """
 
   defmacro __using__(_) do
     quote do

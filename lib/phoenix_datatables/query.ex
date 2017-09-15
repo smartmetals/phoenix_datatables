@@ -6,6 +6,7 @@ defmodule PhoenixDatatables.Query do
   alias PhoenixDatatables.Request.Column
   alias PhoenixDatatables.Request.Search
   alias PhoenixDatatables.Query.Attribute
+  alias PhoenixDatatables.QueryException
 
   def sort(params, queryable, sortable \\ nil)
   def sort(%Params{order: orders} = params, queryable, sortable) when is_list(sortable) do
@@ -47,6 +48,20 @@ defmodule PhoenixDatatables.Query do
       nil -> nil
       number when is_number(number) -> number + 1
     end
+  end
+  def join_order(queryable, parent) do
+    QueryException.raise(:join_order, """
+
+      An attempt was made to interrogate the join structure of #{inspect queryable}
+      This is not an %Ecto.Query{}. The most likely cause for this error is using
+      dot-notation(e.g. 'category.name') in the column name defined in the datatables
+      client config but a simple Schema (no join) is used as the underlying queryable.
+
+      Please check the client config for the fields belonging to #{inspect parent}. If
+      the required field does belong to a different parent schema, that schema needs to
+      be joined in the Ecto query.
+
+    """)
   end
 
   defp join_relation(%JoinExpr{assoc: {_, relation}}), do: relation
@@ -106,9 +121,27 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
-  def search(queryable, params, searchable \\ nil)
-  def search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
-  def search(queryable, %Params{} = params, searchable) when is_list(searchable) do
+  def search(queryable, params, options \\ []) do
+    case queryable do
+      %Ecto.Query{} = queryable ->
+        if queryable.wheres do
+          QueryException.raise(:search, """
+            Search contained a top-level where clause, which is not permitted.
+            Instead, pass your where clause wrapped with Ecto.Query.dynamic e.g.
+
+              search(queryable, params, where: dynamic([t], t.color == "blue"))
+
+            https://hexdocs.pm/ecto/Ecto.Query.html#dynamic/2
+          """)
+        end
+       _schema -> nil
+    end
+    dynamic_where = options[:where]
+    columns = options[:columns]
+    do_search(queryable, params, dynamic_where, columns)
+  end
+  def do_search(queryable, %Params{search: %Search{value: ""}}, _dynamic_where, _), do: queryable
+  def do_search(queryable, %Params{} = params, _dynamic_where, searchable) when is_list(searchable) do
     search_term = "%#{params.search.value}%"
     Enum.reduce params.columns, queryable, fn({_, v}, acc_queryable) ->
       with {column, join_index} when is_number(join_index) <- v.data |> cast_column(searchable),
@@ -123,7 +156,7 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
-  def search(queryable, %Params{ search: search, columns: columns}, _searchable) do
+  def do_search(queryable, %Params{search: search, columns: columns}, _dynamic_where, _searchable) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
     Enum.reduce columns, queryable, fn({_, v}, acc_queryable) ->
@@ -153,5 +186,16 @@ defmodule PhoenixDatatables.Query do
       |> repo.one
 
     total_entries || 0
+  end
+
+end
+
+defmodule PhoenixDatatables.QueryException do
+  defexception [:message, :operation]
+
+  @dialyzer {:no_return, raise: 1} #yes we know it raises
+
+  def raise(operation, message \\ "") do
+    Kernel.raise __MODULE__, [operation: operation, message: message]
   end
 end
