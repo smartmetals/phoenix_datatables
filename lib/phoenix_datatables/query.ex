@@ -172,17 +172,18 @@ defmodule PhoenixDatatables.Query do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
     dynamic = dynamic([], true)
-    Enum.reduce columns, queryable, fn({_, v}, acc_dynamic) ->
-      with %Attribute{} = attribute <- v.data |> Attribute.extract(schema),
-            true <- v.searchable do
-        acc_dynamic
-        |> search_relation(join_order(queryable, attribute.parent),
-                        attribute.name,
-                        search_term)
-      else
-        _ -> acc_dynamic
+    dynamic =
+      Enum.reduce columns, dynamic, fn({_, v}, acc_dynamic) ->
+        with %Attribute{} = attribute <- v.data |> Attribute.extract(schema),
+              true <- v.searchable do
+          acc_dynamic
+          |> search_relation(join_order(queryable, attribute.parent),
+                          attribute.name,
+                          search_term)
+        else
+          _ -> acc_dynamic
+        end
       end
-    end
     if dynamic_where do
       where(queryable, [], ^dynamic and ^dynamic_where)
     else

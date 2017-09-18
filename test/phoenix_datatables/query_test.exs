@@ -37,7 +37,7 @@ defmodule PhoenixDatatables.QueryTest do
           %{"regex" => "false", "value" => "1NSN"}
         ) |> Request.receive
 
-      assert Query.search(query, params) |> IO.inspect #Map.get(:wheres)
+      assert Query.search(query, params) |> Map.get(:wheres)
     end
 
     test "raises an exception if dot-notation used in column name" do
