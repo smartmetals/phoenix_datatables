@@ -24,10 +24,9 @@ defmodule PhoenixDatatables.Query.Macros do
   defp def_search_relation(num) do
     bindings = bind_number(num)
     quote do
-      defp search_relation(queryable, unquote(num), attribute, search_term) do
-        or_where(queryable,
-                 unquote(bindings),
-                 fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute), ^search_term))
+      defp search_relation(dynamic, unquote(num), attribute, search_term) do
+        dynamic(unquote(bindings),
+                fragment("CAST(? AS TEXT) ILIKE ?", field(t, ^attribute), ^search_term) or ^dynamic)
       end
     end
   end

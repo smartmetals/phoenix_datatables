@@ -140,35 +140,53 @@ defmodule PhoenixDatatables.Query do
     columns = options[:columns]
     do_search(queryable, params, dynamic_where, columns)
   end
-  def do_search(queryable, %Params{search: %Search{value: ""}}, _dynamic_where, _), do: queryable
-  def do_search(queryable, %Params{} = params, _dynamic_where, searchable) when is_list(searchable) do
+  def do_search(queryable, %Params{search: %Search{value: ""}}, dynamic_where, _) do
+    if dynamic_where do
+      where(queryable, ^dynamic_where)
+    else
+      queryable
+    end
+  end
+  def do_search(queryable, %Params{} = params, dynamic_where, searchable) when is_list(searchable) do
     search_term = "%#{params.search.value}%"
-    Enum.reduce params.columns, queryable, fn({_, v}, acc_queryable) ->
+    dynamic = dynamic([], true)
+    dynamic = Enum.reduce params.columns, dynamic, fn({_, v}, acc_dynamic) ->
       with {column, join_index} when is_number(join_index) <- v.data |> cast_column(searchable),
             true <- v.searchable do
-        acc_queryable
+        acc_dynamic
         |> search_relation(join_index,
                           column,
                           search_term)
       else
-        _ -> acc_queryable
+        _ -> acc_dynamic
       end
+    end
+    if dynamic_where do
+      where(queryable, [], ^dynamic and ^dynamic_where)
+    else
+      where(queryable, [], ^dynamic)
     end
   end
 
-  def do_search(queryable, %Params{search: search, columns: columns}, _dynamic_where, _searchable) do
+  def do_search(queryable, %Params{search: search, columns: columns}, dynamic_where, _searchable) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
-    Enum.reduce columns, queryable, fn({_, v}, acc_queryable) ->
+    dynamic = dynamic([], true)
+    Enum.reduce columns, queryable, fn({_, v}, acc_dynamic) ->
       with %Attribute{} = attribute <- v.data |> Attribute.extract(schema),
             true <- v.searchable do
-        acc_queryable
+        acc_dynamic
         |> search_relation(join_order(queryable, attribute.parent),
                         attribute.name,
                         search_term)
       else
-        _ -> acc_queryable
+        _ -> acc_dynamic
       end
+    end
+    if dynamic_where do
+      where(queryable, [], ^dynamic and ^dynamic_where)
+    else
+      where(queryable, [], ^dynamic)
     end
   end
 

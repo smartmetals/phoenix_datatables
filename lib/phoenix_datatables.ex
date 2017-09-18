@@ -161,13 +161,13 @@ defmodule PhoenixDatatables do
     the column :data attribute should be set to `nsn` for the first column and `category.name` for the second.
   """
   @spec execute(Ecto.Queryable.t, Conn.params, Ecto.Repo.t, Keyword.t | nil) :: Payload.t
-  def execute(query, params, repo, columns \\ nil) do
+  def execute(query, params, repo, options \\ []) do
     params = Request.receive(params)
     total_entries = Query.total_entries(query, repo)
     filtered_query =
       params
-      |> Query.sort(query, columns)
-      |> Query.search(params, columns)
+      |> Query.sort(query, options[:columns])
+      |> Query.search(params, options)
       |> Query.paginate(params)
 
     filtered_entries = Query.total_entries(filtered_query, repo)
