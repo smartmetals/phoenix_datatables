@@ -130,7 +130,7 @@ defmodule PhoenixDatatables.Query do
 
             search(queryable, params, where: dynamic([t], t.color == "blue"))
 
-          where clause we found: {inspect list}
+          where clause we found: #{inspect list}
 
           https://hexdocs.pm/ecto/Ecto.Query.html#dynamic/2
         """)
