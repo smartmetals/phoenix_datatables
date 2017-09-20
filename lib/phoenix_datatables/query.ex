@@ -149,7 +149,7 @@ defmodule PhoenixDatatables.Query do
   end
   def do_search(queryable, %Params{} = params, dynamic_where, searchable) when is_list(searchable) do
     search_term = "%#{params.search.value}%"
-    dynamic = nil
+    dynamic = dynamic([], false)
     dynamic = Enum.reduce params.columns, dynamic, fn({_, v}, acc_dynamic) ->
       with {column, join_index} when is_number(join_index) <- v.data |> cast_column(searchable),
             true <- v.searchable do
@@ -162,7 +162,8 @@ defmodule PhoenixDatatables.Query do
       end
     end
     if dynamic_where do
-      where(queryable, [], ^dynamic and ^dynamic_where)
+      dynamic = dynamic([], ^dynamic and ^dynamic_where)
+      where(queryable, [], ^dynamic)
     else
       where(queryable, [], ^dynamic)
     end
@@ -171,7 +172,7 @@ defmodule PhoenixDatatables.Query do
   def do_search(queryable, %Params{search: search, columns: columns}, dynamic_where, _searchable) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
-    dynamic = nil
+    dynamic = dynamic([], false)
     dynamic =
       Enum.reduce columns, dynamic, fn({_, v}, acc_dynamic) ->
         with %Attribute{} = attribute <- v.data |> Attribute.extract(schema),
@@ -185,7 +186,8 @@ defmodule PhoenixDatatables.Query do
         end
       end
     if dynamic_where do
-      where(queryable, [], ^dynamic and ^dynamic_where)
+      dynamic = dynamic([], ^dynamic and ^dynamic_where)
+      where(queryable, [], ^dynamic)
     else
       where(queryable, [], ^dynamic)
     end
