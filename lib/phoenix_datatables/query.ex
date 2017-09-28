@@ -122,32 +122,11 @@ defmodule PhoenixDatatables.Query do
   end
 
   def search(queryable, params, options \\ []) do
-    case queryable do
-      %Ecto.Query{wheres: list} when is_list(list) and length(list) > 0 ->
-        QueryException.raise(:search, """
-          Search contained a top-level where clause, which is not permitted.
-          Instead, pass your where clause wrapped with Ecto.Query.dynamic e.g.
-
-            search(queryable, params, where: dynamic([t], t.color == "blue"))
-
-          where clause we found: #{inspect list}
-
-          https://hexdocs.pm/ecto/Ecto.Query.html#dynamic/2
-        """)
-       _schema -> nil
-    end
-    dynamic_where = options[:where]
     columns = options[:columns]
-    do_search(queryable, params, dynamic_where, columns)
+    do_search(queryable, params, columns)
   end
-  def do_search(queryable, %Params{search: %Search{value: ""}}, dynamic_where, _) do
-    if dynamic_where do
-      where(queryable, ^dynamic_where)
-    else
-      queryable
-    end
-  end
-  def do_search(queryable, %Params{} = params, dynamic_where, searchable) when is_list(searchable) do
+  def do_search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
+  def do_search(queryable, %Params{} = params, searchable) when is_list(searchable) do
     search_term = "%#{params.search.value}%"
     dynamic = dynamic([], false)
     dynamic = Enum.reduce params.columns, dynamic, fn({_, v}, acc_dynamic) ->
@@ -161,15 +140,10 @@ defmodule PhoenixDatatables.Query do
         _ -> acc_dynamic
       end
     end
-    if dynamic_where do
-      dynamic = dynamic([], ^dynamic and ^dynamic_where)
-      where(queryable, [], ^dynamic)
-    else
-      where(queryable, [], ^dynamic)
-    end
+    where(queryable, [], ^dynamic)
   end
 
-  def do_search(queryable, %Params{search: search, columns: columns}, dynamic_where, _searchable) do
+  def do_search(queryable, %Params{search: search, columns: columns}, _searchable) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
     dynamic = dynamic([], false)
@@ -185,12 +159,7 @@ defmodule PhoenixDatatables.Query do
           _ -> acc_dynamic
         end
       end
-    if dynamic_where do
-      dynamic = dynamic([], ^dynamic and ^dynamic_where)
-      where(queryable, [], ^dynamic)
-    else
-      where(queryable, [], ^dynamic)
-    end
+    where(queryable, [], ^dynamic)
   end
 
   # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex

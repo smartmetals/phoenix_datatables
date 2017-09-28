@@ -131,34 +131,39 @@ defmodule PhoenixDatatables do
     Prepare and execute a provided query, modified based on the params map. with the results returned in a `Payload` which
     can be encoded to json by Phoenix / Poison and consumed by the DataTables client.
 
-    `columns` may be passed - but are optional. If columns are not provided, the list of
-    valid columns to use for filtering and ordering is determined by introspection of the
-    Ecto query, and the attributes and associations defined in the Schema's used in that
-    query. This will not always work - Ecto queries may contain subqueries or schema-less queries.
 
-    A list of valid columns that are eligibile to be used for sorting and filtering can be passed in
-    a nested keyword list, where the first keyword is the table name, and second is
-    the column name and query binding order.
+    ## Options
 
-    For example, suppose you have an items table that you join to a category table
-    to include the category name in your datatable. Your ecto query may look like:
+  * `:columns` - If columns are not provided, the list of
+     valid columns to use for filtering and ordering is determined by introspection of the
+     Ecto query, and the attributes and associations defined in the Schema's used in that
+     query. This will not always work - Ecto queries may contain subqueries or schema-less queries.
 
-      query =
-        (from item in Item,
-        join: category in assoc(item, :category),
-        select: %{id: item.id, item.nsn, category_name: category.name})
+     A list of valid columns that are eligibile to be used for sorting and filtering can be passed in
+     a nested keyword list, where the first keyword is the table name, and second is
+     the column name and query binding order.
 
-    This query can be interpreted automatically just fine as it is based on schemas and associations.
-    However there is another reason to specify `columns`. The client will provide columns
-    to use to filter and search in its request, but client input cannot be trusted. A denial of service
-    attack could be constructed by requesting search against un-indexed fields on a large table for example.
-    To harden your server you could limit the on the server-side the sorting and filtering possiblities
-    by specifying the columns that should be available.
+     For example, suppose you have an items table that you join to a category table
+     to include the category name in your datatable. Your ecto query may look like:
 
-    To limit order/where clauses to include only the NSN and category name, you could pass a `columns`
-    argument as `[nsn: 0, category: [name: 1]]`. Here the 0 means the nsn column belongs to the `from` table,
-    and there is a `category.name` field, which is the first join table in the query. In the client configuration,
-    the column :data attribute should be set to `nsn` for the first column and `category.name` for the second.
+       query =
+         (from item in Item,
+         join: category in assoc(item, :category),
+         select: %{id: item.id, item.nsn, category_name: category.name})
+
+     This query can be interpreted automatically just fine as it is based on schemas and associations.
+     However there is another reason to specify `columns`. The client will provide columns
+     to use to filter and search in its request, but client input cannot be trusted. A denial of service
+     attack could be constructed by requesting search against un-indexed fields on a large table for example.
+     To harden your server you could limit the on the server-side the sorting and filtering possiblities
+     by specifying the columns that should be available.
+
+     To limit order/where clauses to include only the NSN and category name, you could pass a `columns`
+     argument as `[nsn: 0, category: [name: 1]]`. Here the 0 means the nsn column belongs to the `from` table,
+     and there is a `category.name` field, which is the first join table in the query. In the client configuration,
+     the column :data attribute should be set to `nsn` for the first column and `category.name` for the second.
+
+     * `:where` - The queryable passed to `execute` cannot contain a top-level `where` clause - this is because 
   """
   @spec execute(Ecto.Queryable.t, Conn.params, Ecto.Repo.t, Keyword.t | nil) :: Payload.t
   def execute(query, params, repo, options \\ []) do

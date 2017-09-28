@@ -187,12 +187,13 @@ defmodule PhoenixDatatables.QueryTest do
       assert Enum.count(results) == 1
     end
 
-    test "will apply a dynamic where clause as AND condition with search param" do
+    test "will apply a where clause as AND condition with search param" do
       add_items()
       query =
       (from item in Item,
         join: category in assoc(item, :category),
-        select: %{id: item.id, category_name: category.name})
+        select: %{id: item.id, category_name: category.name},
+        where: category.name == "B")
       params =
         Map.put(
           Factory.raw_request,
@@ -200,9 +201,10 @@ defmodule PhoenixDatatables.QueryTest do
           %{"regex" => "false", "value" => "1NSN"}
         )
         |> Request.receive
-      dynamic = dynamic([_, category], category.name == "B")
-      results = Query.search(query, params, where: dynamic)
-      |> Repo.all
+      results =
+        query
+        |> Query.search(params)
+        |> Repo.all
       assert Enum.count(results) == 0
     end
 
