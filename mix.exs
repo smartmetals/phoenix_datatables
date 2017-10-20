@@ -7,7 +7,8 @@ defmodule PhoenixDatatables.Mixfile do
       version: "0.0.1",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
-      deps: deps()
+      deps: deps(),
+      docs: [main: "readme", extras: ["README.md"]]
     ]
   end
 
