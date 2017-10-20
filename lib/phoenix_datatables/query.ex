@@ -42,12 +42,13 @@ defmodule PhoenixDatatables.Query do
     do_sorts(queryable, sorts)
   end
 
-  def do_sorts(queryable, sorts) do
+  defp do_sorts(queryable, sorts) do
     Enum.reduce(sorts, queryable, fn {dir, column, join_index}, queryable ->
       order_relation(queryable, join_index, dir, column)
     end)
   end
 
+  @doc false
   def join_order(_, nil), do: 0
   def join_order(%Ecto.Query{} = queryable, parent) do
     case Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) do
@@ -162,8 +163,8 @@ defmodule PhoenixDatatables.Query do
     columns = options[:columns]
     do_search(queryable, params, columns)
   end
-  def do_search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
-  def do_search(queryable, %Params{} = params, searchable) when is_list(searchable) do
+  defp do_search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
+  defp do_search(queryable, %Params{} = params, searchable) when is_list(searchable) do
     search_term = "%#{params.search.value}%"
     dynamic = dynamic([], false)
     dynamic = Enum.reduce params.columns, dynamic, fn({_, v}, acc_dynamic) ->
@@ -180,7 +181,7 @@ defmodule PhoenixDatatables.Query do
     where(queryable, [], ^dynamic)
   end
 
-  def do_search(queryable, %Params{search: search, columns: columns}, _searchable) do
+  defp do_search(queryable, %Params{search: search, columns: columns}, _searchable) do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
     dynamic = dynamic([], false)
@@ -200,6 +201,9 @@ defmodule PhoenixDatatables.Query do
   end
 
   # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
+  @doc """
+  Calculate the number of records that will retrieved with the provided queryable.
+  """
   def total_entries(queryable, repo) do
     total_entries =
       queryable

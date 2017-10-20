@@ -1,4 +1,5 @@
 defmodule PhoenixDatatables.Request.Params do
+  @moduledoc false
   defstruct [
     :draw,
     :start,
@@ -11,6 +12,7 @@ defmodule PhoenixDatatables.Request.Params do
 end
 
 defmodule PhoenixDatatables.Request.Search do
+  @moduledoc false
   defstruct [
     :value,
     :regex
@@ -18,6 +20,7 @@ defmodule PhoenixDatatables.Request.Search do
 end
 
 defmodule PhoenixDatatables.Request.Order do
+  @moduledoc false
   defstruct [
     :column,
     :dir
@@ -25,6 +28,7 @@ defmodule PhoenixDatatables.Request.Order do
 end
 
 defmodule PhoenixDatatables.Request.Column do
+  @moduledoc false
   defstruct [
     :data,
     :name,
@@ -35,13 +39,19 @@ defmodule PhoenixDatatables.Request.Column do
 end
 
 defmodule PhoenixDatatables.Request do
+  @moduledoc """
+  For processing and validating the HTTP request sent from the client.
+  """
   alias PhoenixDatatables.Request.Params
   alias PhoenixDatatables.Request.Search
   alias PhoenixDatatables.Request.Order
   alias PhoenixDatatables.Request.Column
 
+  @doc """
+  Validates and structures a `Plug.Conn.params` object based on a request
+  sent from the Datatables client.
+  """
   def receive(params) do
-
     orders =
       for {_key, val} <- params["order"] do
         %Order{column: val["column"], dir: val["dir"]}
@@ -62,12 +72,13 @@ defmodule PhoenixDatatables.Request do
         regex: params["search"]["regex"]
       }
 
-    %Params{ draw: params["draw"],
-             order: orders,
-             search: search,
-             columns: columns,
-             start: params["start"] || 0,
-             length: params["length"] || 10
+    %Params {
+      draw: params["draw"],
+      order: orders,
+      search: search,
+      columns: columns,
+      start: params["start"] || 0,
+      length: params["length"] || 10
     }
   end
 end
