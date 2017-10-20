@@ -65,10 +65,31 @@ defmodule PhoenixDatatables.Query do
   end
 
   defp join_relation(%JoinExpr{assoc: {_, relation}}), do: relation
-  defp join_relation(join), do: raise "Cannot find schema for non-assoc join: #{inspect join}"
+  defp join_relation(_) do
+    QueryException.raise(:join_relation,"""
 
-  defp schema(%Ecto.Query{} = query), do: query.from |> elem(1)
+    PhoenixDatatables queryables with non-assoc joins must be accompanied by :columns
+    options to define sortable column names and join orders.
+
+    See docs for PhoenixDatatables.execute for more information.
+
+    """)
+  end
+
+  defp schema(%Ecto.Query{} = query), do: check_from(query.from) |> elem(1)
   defp schema(schema) when is_atom(schema), do: schema
+
+  defp check_from(%Ecto.SubQuery{}) do
+    QueryException.raise(:schema, """
+
+    PhoenixDatatables queryables containing subqueries must be accompanied by :columns
+    options to define sortable column names and join orders.
+
+    See docs for PhoenixDatatables.execute for more information.
+
+    """)
+  end
+  defp check_from(from), do: from
 
   defp cast_column(column_name, sortable)
     when is_list(sortable)

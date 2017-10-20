@@ -169,8 +169,9 @@ defmodule PhoenixDatatables do
 
   * `:columns` - If columns are not provided, the list of
      valid columns to use for filtering and ordering is determined by introspection of the
-     Ecto query, and the attributes and associations defined in the Schema's used in that
+     Ecto query, and the attributes and associations defined in the Schemas used in that
      query. This will not always work - Ecto queries may contain subqueries or schema-less queries.
+     Such queryables will need to be accompanied by `:columns` options.
 
      A list of valid columns that are eligibile to be used for sorting and filtering can be passed in
      a nested keyword list, where the first keyword is the table name, and second is
@@ -196,7 +197,6 @@ defmodule PhoenixDatatables do
      and there is a `category.name` field, which is the first join table in the query. In the client configuration,
      the column :data attribute should be set to `nsn` for the first column and `category.name` for the second.
 
-     * `:where` - The queryable passed to `execute` cannot contain a top-level `where` clause - this is because 
   """
   @spec execute(Ecto.Queryable.t, Conn.params, Ecto.Repo.t, Keyword.t | nil) :: Payload.t
   def execute(query, params, repo, options \\ []) do
