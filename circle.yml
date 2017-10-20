@@ -20,8 +20,8 @@ jobs:
       - run: mix local.rebar --force
       - run: mix deps.get
       - run:
-         - command: mix deps.get
-         - working_directory: example
+         command: mix deps.get
+         working_directory: ~/project/example
       - run: mix test
       - save_cache:
           key: dependency-cache-{{ arch }}
