@@ -4,13 +4,8 @@ defmodule PhoenixDatatablesExampleWeb.ItemController do
   alias PhoenixDatatablesExample.Stock
   alias PhoenixDatatablesExample.Stock.Item
 
-  def index(conn, %{"api" => _}) do
-    render(conn, "index-api.html")
-  end
-
   def index(conn, _params) do
-    items = Stock.list_items()
-    render(conn, "index.html", items: items)
+    render(conn, "index.html")
   end
 
   def new(conn, _params) do
