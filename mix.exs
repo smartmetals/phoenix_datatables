@@ -4,11 +4,13 @@ defmodule PhoenixDatatables.Mixfile do
   def project do
     [
       app: :phoenix_datatables,
-      version: "0.0.1",
+      version: "0.1.0",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),
-      docs: [main: "readme", extras: ["README.md"]]
+      docs: [main: "readme", extras: ["README.md"]],
+      package: package(),
+      description: description()
     ]
   end
 
@@ -33,5 +35,19 @@ defmodule PhoenixDatatables.Mixfile do
       {:dialyxir, "~> 0.5", only: :dev, runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
     ]
+  end
+
+  defp description do
+    """
+    Implements a server-side API for the jQuery Datatables library. Provides
+    sort, search and pagination based on parameters received in client request.
+    """
+  end
+
+  defp package do
+    [files: ["lib", "mix.exs", "README.md", "LICENSE"],
+     maintainers: ["Jeremy Huffman"],
+     licenses: ["MIT"],
+     links: %{"GitHub" => "https://github.com/smartmetals/phoenix_datatables"}]
   end
 end

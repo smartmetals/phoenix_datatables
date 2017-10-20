@@ -3,6 +3,14 @@
   Phoenix Datatables provides support to quickly build an implementation
   of the [DataTables](https://datatables.net/) server-side API in your [Phoenix Framework](http://phoenixframework.org/) application.
 
+  Add this to your `mix.exs` dependency list:
+
+```elixir
+{:phoenix_datatables, "~> 0.1.0"}
+```
+
+  There is a complete [example](https://github.com/smartmetals/phoenix_datatables/tree/master/example).
+
   A full solution would typically use or include the following components:
 
   * A repository helper function to execute queries with client params
