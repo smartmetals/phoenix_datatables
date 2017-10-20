@@ -17,6 +17,7 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ arch }}
       - run: mix local.hex --force
+      - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix test
       - save_cache:
