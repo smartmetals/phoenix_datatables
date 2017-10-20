@@ -1,4 +1,7 @@
 defmodule PhoenixDatatables.Query do
+  @moduledoc """
+  Functions for updating an `Ecto.Query` based on Datatables request parameters.
+  """
   import Ecto.Query
   use PhoenixDatatables.Query.Macros
   alias Ecto.Query.JoinExpr
@@ -21,7 +24,8 @@ defmodule PhoenixDatatables.Query do
         with dir when is_atom(dir) <- cast_dir(order.dir),
              %Column{} = column <- params.columns[order.column],
              true <- column.orderable,
-             {column, join_index} when is_number(join_index) <- cast_column(column.data, sortable) do
+             {column, join_index} when is_number(join_index)
+                                    <- cast_column(column.data, sortable) do
           {dir, column, join_index}
         end
       end
@@ -35,7 +39,8 @@ defmodule PhoenixDatatables.Query do
              %Column{} = column <- params.columns[order.column],
              true <- column.orderable,
              %Attribute{} = attribute <- Attribute.extract(column.data, schema),
-             join_index when is_number(join_index) <- join_order(queryable, attribute.parent) do
+               join_index when is_number(join_index)
+                           <- join_order(queryable, attribute.parent) do
           {dir, attribute.name, join_index}
         end
       end
@@ -73,7 +78,7 @@ defmodule PhoenixDatatables.Query do
 
   defp join_relation(%JoinExpr{assoc: {_, relation}}), do: relation
   defp join_relation(_) do
-    QueryException.raise(:join_relation,"""
+    QueryException.raise(:join_relation, """
 
     PhoenixDatatables queryables with non-assoc joins must be accompanied by :columns
     options to define sortable column names and join orders.
@@ -83,7 +88,7 @@ defmodule PhoenixDatatables.Query do
     """)
   end
 
-  defp schema(%Ecto.Query{} = query), do: check_from(query.from) |> elem(1)
+  defp schema(%Ecto.Query{} = query), do: query.from |> check_from() |> elem(1)
   defp schema(schema) when is_atom(schema), do: schema
 
   defp check_from(%Ecto.SubQuery{}) do
@@ -108,8 +113,10 @@ defmodule PhoenixDatatables.Query do
       case member do
         children when is_list(children) ->
           with [child] <- child,
-                [child] <- Enum.filter(Keyword.keys(children), &(Atom.to_string(&1) == child)),
-                {:ok, order} when is_number(order) <- Keyword.fetch(children, child) do
+               [child] <- Enum.filter(Keyword.keys(children),
+                                      &(Atom.to_string(&1) == child)),
+               {:ok, order} when is_number(order)
+                              <- Keyword.fetch(children, child) do
             {child, order}
           else
             _ -> {:error, "#{column_name} is not a sortable column."}
@@ -168,7 +175,8 @@ defmodule PhoenixDatatables.Query do
     search_term = "%#{params.search.value}%"
     dynamic = dynamic([], false)
     dynamic = Enum.reduce params.columns, dynamic, fn({_, v}, acc_dynamic) ->
-      with {column, join_index} when is_number(join_index) <- v.data |> cast_column(searchable),
+      with {column, join_index} when is_number(join_index)
+                                  <- v.data |> cast_column(searchable),
             true <- v.searchable do
         acc_dynamic
         |> search_relation(join_index,
@@ -200,7 +208,9 @@ defmodule PhoenixDatatables.Query do
     where(queryable, [], ^dynamic)
   end
 
-  # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
+  # credo:disable-for-lines:2
+  # credit to scrivener library:
+  # https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
   # Copyright (c) 2016 Andrew Olson
   @doc """
   Calculate the number of records that will retrieved with the provided queryable.

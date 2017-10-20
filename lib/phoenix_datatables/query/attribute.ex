@@ -6,7 +6,6 @@ defmodule PhoenixDatatables.Query.Attribute do
 
   defstruct name: nil, parent: nil
 
-
   @type t :: %__MODULE__{}
 
   @spec extract(String.t, atom) :: t | {:error, :attribute_not_found}

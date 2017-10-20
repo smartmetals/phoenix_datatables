@@ -3,7 +3,11 @@ defmodule PhoenixDatatables.Response.Payload do
   A struct which serialies with `Poison` to the json response expected by the
   Datatables client library.
   """
-  defstruct draw: 0, recordsTotal: 0, recordsFiltered: 0, data: [%{}], error: nil
+  defstruct draw: 0,
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: [%{}],
+            error: nil
 
   @type t :: %__MODULE__{}
 end

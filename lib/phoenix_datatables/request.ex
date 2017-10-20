@@ -64,7 +64,7 @@ defmodule PhoenixDatatables.Request do
           searchable: val["searchable"] == "true",
           orderable: val["orderable"] == "true",
           search: %Search{value: val["search"]["value"], regex: val["search"]["regex"]}
-        } }
+        }}
       end)
     search =
       %Search {

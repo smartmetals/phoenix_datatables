@@ -14,7 +14,6 @@ defmodule PhoenixDatatables do
     Prepare and execute a provided query, modified based on the params map. with the results returned in a `Payload` which
     can be encoded to json by Phoenix / Poison and consumed by the DataTables client.
 
-
     ## Options
 
   * `:columns` - If columns are not provided, the list of
@@ -24,7 +23,6 @@ defmodule PhoenixDatatables do
      Such queryables will need to be accompanied by `:columns` options.
 
      &nbsp;
-
 
      Even if the queryable uses only schemas and joins built with `assoc` there are security reasons to
      provide a `:columns` option.
@@ -65,7 +63,10 @@ defmodule PhoenixDatatables do
     &nbsp;
 
   """
-  @spec execute(Ecto.Queryable.t, Conn.params, Ecto.Repo.t, Keyword.t | nil) :: Payload.t
+  @spec execute(Ecto.Queryable.t,
+                Conn.params,
+                Ecto.Repo.t,
+                Keyword.t | nil) :: Payload.t
   def execute(query, params, repo, options \\ []) do
     params = Request.receive(params)
     total_entries = Query.total_entries(query, repo)
@@ -87,7 +88,6 @@ defmodule PhoenixDatatables do
   Payload, often used in a json view for example
   to convert an Ecto schema to a plain map so it can be serialized by Poison.
 
-
      query
      |> Repo.fetch_datatable(params)
      |> PhoenixDatatables.map_payload(fn item -> %{
@@ -97,7 +97,7 @@ defmodule PhoenixDatatables do
 """
   @spec map_payload(Payload.t, (any -> any)) :: Payload.t
   def map_payload(%Payload{} = payload, fun) when is_function(fun) do
-    %Payload { payload |
+    %Payload {payload |
       data: Enum.map(payload.data, fun)
     }
   end
