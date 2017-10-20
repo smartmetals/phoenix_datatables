@@ -15,6 +15,6 @@ defmodule PhoenixDatatablesExampleWeb.FallbackController do
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
-    |> render(PhoenixDatatablesExampleWeb.ErrorView, :"404")
+    |> render(PhoenixDatatablesExampleWeb.ErrorView, "404.html", [])
   end
 end

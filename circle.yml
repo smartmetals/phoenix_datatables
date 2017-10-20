@@ -1,0 +1,35 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/elixir:latest
+        environment:
+          CI: true
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          PHANTOMJS_VERSION: 2.1.1
+      - image: postgres:9.6.2
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ arch }}
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - run:
+         command: mix deps.get
+         working_directory: ~/project/example
+      - run: mix test
+      - save_cache:
+          key: dependency-cache-{{ arch }}
+          paths:
+            - deps
+            - _build
+experimental:
+  notify:
+    branches:
+      only:
+        - master

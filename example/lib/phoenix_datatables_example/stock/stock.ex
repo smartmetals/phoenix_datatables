@@ -5,8 +5,11 @@ defmodule PhoenixDatatablesExample.Stock do
 
   import Ecto.Query, warn: false
   alias PhoenixDatatablesExample.Repo
-
   alias PhoenixDatatablesExample.Stock.Item
+
+  def datatable_items(params) do
+    Repo.fetch_datatable(Item, params)
+  end
 
   @doc """
   Returns the list of items.

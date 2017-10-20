@@ -8,7 +8,7 @@ defmodule PhoenixDatatables.ResponseTest do
   alias PhoenixDatatablesExample.Stock.Category
   alias PhoenixDatatablesExample.Factory
 
-  describe "send" do
+  describe "new" do
     test "returns queried data in correct format" do
       add_items()
       query =
@@ -23,37 +23,18 @@ defmodule PhoenixDatatables.ResponseTest do
         )
         |> Request.receive
       search_results = Query.search(query, request)
-      payload = Response.send(search_results, request.draw, Response.total_entries(Item, Repo), Repo)
+
+      payload =
+        search_results
+        |> Repo.all
+        |> Response.new(request.draw,
+                        Query.total_entries(Item, Repo),
+                        Query.total_entries(search_results, Repo))
 
       assert payload.draw == request.draw
       assert payload.recordsFiltered == length(Repo.all(search_results))
       assert payload.recordsTotal == length(Repo.all(Item))
       assert payload.data == Repo.all(search_results)
-    end
-  end
-
-  describe "total_entries" do
-    test "returns number of results in specified schema" do
-      add_items()
-      assert Response.total_entries(Item, Repo) == length(Repo.all(Item))
-    end
-
-    test "returns number of results in a query" do
-      add_items()
-      query =
-        (from item in Item,
-          join: category in assoc(item, :category),
-          select: %{id: item.id}
-        )
-      request =
-        Map.put(
-          Factory.raw_request,
-          "search",
-          %{"regex" => "false", "value" => "1NSN"}
-        )
-        |> Request.receive
-      search_results = Query.search(query, request)
-      assert Response.total_entries(search_results, Repo) == 1
     end
   end
 

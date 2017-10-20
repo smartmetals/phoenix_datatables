@@ -1,5 +1,6 @@
 defmodule PhoenixDatatablesExample.Repo do
   use Ecto.Repo, otp_app: :phoenix_datatables_example
+  use PhoenixDatatables.Repo
 
   @doc """
   Dynamically loads the repository url from the

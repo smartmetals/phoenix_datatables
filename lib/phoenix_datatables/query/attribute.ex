@@ -1,10 +1,10 @@
 # from: https://github.com/valyukov/ex_sieve
+# Copyright (c) 2016 Vlad Alyukov
 
 defmodule PhoenixDatatables.Query.Attribute do
   @moduledoc false
 
   defstruct name: nil, parent: nil
-
 
   @type t :: %__MODULE__{}
 

@@ -18,10 +18,8 @@ defmodule PhoenixDatatables.QueryTest do
       assert item2.id != nil
       assert item2.nsn < item1.nsn
 
-      query =
-        Factory.raw_request
-        |> Request.receive
-        |> Query.sort(Item, @sortable)
+      params = Factory.raw_request |> Request.receive
+      query = Query.sort(Item, params, @sortable)
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
@@ -34,10 +32,8 @@ defmodule PhoenixDatatables.QueryTest do
       assert item2.id != nil
       assert item2.nsn < item1.nsn
 
-      query =
-        Factory.raw_request
-        |> Request.receive
-        |> Query.sort(Item)
+      params = Factory.raw_request |> Request.receive
+      query = Query.sort(Item, params)
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
@@ -53,10 +49,8 @@ defmodule PhoenixDatatables.QueryTest do
         select: %{id: item.id, category_name: category.name})
 
       do_test = fn request ->
-        query =
-          request
-          |> Request.receive
-          |> Query.sort(query, @sortable_join)
+        params = request |> Request.receive
+        query = Query.sort(query, params, @sortable_join)
 
         [ritem2, ritem1] = query |> Repo.all
         assert item1.id == ritem1.id
@@ -76,10 +70,8 @@ defmodule PhoenixDatatables.QueryTest do
           join: category in assoc(item, :category),
           select: %{id: item.id, category_name: category.name})
 
-      query =
-        request
-        |> Request.receive
-        |> Query.sort(query)
+      params = request |> Request.receive
+      query = Query.sort(query, params)
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
@@ -92,10 +84,8 @@ defmodule PhoenixDatatables.QueryTest do
                     "1" => %{"column" => "2", "dir" => "asc"}}
       request = %{Factory.raw_request | "order" => orderings}
 
-      query =
-        request
-        |> Request.receive
-        |> Query.sort(Item)
+      params = request |> Request.receive
+      query = Query.sort(Item, params)
 
       assert query.order_bys |> Enum.count == 2
     end
@@ -116,10 +106,8 @@ defmodule PhoenixDatatables.QueryTest do
                     unit_description: unit.description
         })
 
-      query =
-        request
-        |> Request.receive
-        |> Query.sort(query)
+      params = request |> Request.receive
+      query = Query.sort(query, params)
 
       assert query.order_bys |> Enum.count == 2
 
@@ -169,6 +157,7 @@ defmodule PhoenixDatatables.QueryTest do
   end
 
   describe "search" do
+
     test "returns 1 result when 1 match found" do
       add_items()
       query =
@@ -186,6 +175,27 @@ defmodule PhoenixDatatables.QueryTest do
       assert Enum.count(results) == 1
     end
 
+    test "will apply a where clause as AND condition with search param" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name},
+        where: category.name == "B")
+      params =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        )
+        |> Request.receive
+      results =
+        query
+        |> Query.search(params)
+        |> Repo.all
+      assert Enum.count(results) == 0
+    end
+
     test "will only search in searchable fields when those are specified" do
       add_items()
       query =
@@ -199,12 +209,37 @@ defmodule PhoenixDatatables.QueryTest do
           %{"regex" => "false", "value" => "1NSN"}
         ) |> Request.receive
       results =
-        Query.search(query, params, [:nsn])
+        Query.search(query, params, columns: [:frogs])
         |> Repo.all
 
-      assert Enum.count(results) == 1
+      assert Enum.count(results) == 0
     end
 
+  end
+
+  describe "total_entries" do
+    test "returns number of results in specified schema" do
+      add_items()
+      assert Query.total_entries(Item, Repo) == length(Repo.all(Item))
+    end
+
+    test "returns number of results in a query" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id}
+      )
+      request =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "1NSN"}
+        )
+        |> Request.receive
+      search_results = Query.search(query, request)
+      assert Query.total_entries(search_results, Repo) == 1
+    end
   end
 
   def add_items do

@@ -1,35 +1,39 @@
 defmodule PhoenixDatatables.Response.Payload do
-  defstruct draw: 0, recordsTotal: 0, recordsFiltered: 0, data: [%{}], error: nil
+  @moduledoc """
+  A struct which serialies with `Poison` to the json response expected by the
+  Datatables client library.
+  """
+  defstruct draw: 0,
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: [%{}],
+            error: nil
+
+  @type t :: %__MODULE__{}
 end
 
 defmodule PhoenixDatatables.Response do
-  import Ecto.Query
-
+  @moduledoc """
+  Provides a Payload constructor.
+  """
   alias PhoenixDatatables.Response.Payload
 
-  def send(query, draw, total_entries, repo) do
+  @doc """
+  Construct the `PhoenixDatatables.Response.Payload` based on the constituent data:
+
+    * `:data` - A list of maps representing the query results.
+    * `:recordsTotal` - The number of records available before client's requested filters are applied.
+    * `:recordsFiltered` - The number of records available after client's requested filters are applied.
+    * `:draw` - The draw counter received from the client is echoed back to distinguish multiple responses.
+
+  """
+  def new(data, draw, total_entries, filtered_entries) do
     %Payload {
       draw: draw,
       recordsTotal: total_entries,
-      recordsFiltered: total_entries(query, repo),
-      data: repo.all(query),
+      recordsFiltered:  filtered_entries,
+      data: data,
       error: nil
     }
-  end
-
-  # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
-  def total_entries(queryable, repo) do
-    total_entries =
-      queryable
-      |> exclude(:preload)
-      |> exclude(:select)
-      |> exclude(:order_by)
-      |> exclude(:limit)
-      |> exclude(:offset)
-      |> subquery
-      |> select(count("*"))
-      |> repo.one
-
-    total_entries || 0
   end
 end
