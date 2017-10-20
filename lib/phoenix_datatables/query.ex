@@ -18,7 +18,7 @@ defmodule PhoenixDatatables.Query do
   for details.
   """
   def sort(queryable, params, sortable \\ nil)
-  def sort(%Params{order: orders} = params, queryable, sortable) when is_list(sortable) do
+  def sort(queryable, %Params{order: orders} = params, sortable) when is_list(sortable) do
     sorts =
       for order <- orders do
         with dir when is_atom(dir) <- cast_dir(order.dir),
