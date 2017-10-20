@@ -128,8 +128,9 @@ end
   excellent manual, references and community content available throught the DataTables
   [website](https://datatables.net/manual/server-side).
 
-```json
 `package.json`
+
+```json
 
   "dependencies": {
     "jquery": "^3.2.1",
@@ -142,7 +143,7 @@ end
   }
 ```
 
-    `brunch-config.js`
+`brunch-config.js`
     
 ```javascript
 
@@ -160,8 +161,7 @@ end
 
 ```
 
-
-    `index.html.eex`
+`index.html.eex`
 
 ```html
 <table data-datatable-server class="table">
@@ -179,7 +179,7 @@ end
 </table>
 ```
 
-    `app.js`
+`app.js`
 
 ```javascript
 import $ from 'jquery';
@@ -202,3 +202,12 @@ $(document).ready(() => {
   };
 };
 ```
+
+
+## Credits
+
+Libraries which provided inspiration and some code include: 
+
+* `scrivener_ecto`: https://github.com/drewolson/scrivener_ecto
+
+* `ex_sieve`: https://github.com/valyukov/ex_sieve

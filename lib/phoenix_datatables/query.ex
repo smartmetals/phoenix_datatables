@@ -201,6 +201,7 @@ defmodule PhoenixDatatables.Query do
   end
 
   # credit to scrivener library: https://github.com/drewolson/scrivener_ecto/blob/master/lib/scrivener/paginater/ecto/query.ex
+  # Copyright (c) 2016 Andrew Olson
   @doc """
   Calculate the number of records that will retrieved with the provided queryable.
   """

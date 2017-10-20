@@ -1,4 +1,5 @@
 # from: https://github.com/valyukov/ex_sieve
+# Copyright (c) 2016 Vlad Alyukov
 
 defmodule PhoenixDatatables.Query.Attribute do
   @moduledoc false
