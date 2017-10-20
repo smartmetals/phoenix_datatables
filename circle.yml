@@ -19,6 +19,9 @@ jobs:
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
+      - run:
+         - command: mix deps.get
+         - working_directory: example
       - run: mix test
       - save_cache:
           key: dependency-cache-{{ arch }}
