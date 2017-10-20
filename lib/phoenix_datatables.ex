@@ -45,9 +45,10 @@ defmodule PhoenixDatatables do
 
   ## Controller
 
-  The controller is just like any other Phoenix json controller - the raw params request
-  just needs to be passed to the datatables function and the output returned
-  to the view. Typically the routing entry would be setup under the :api scope.
+  The controller is like any other Phoenix json controller - the raw params request
+  from Datatables needs to be passed to the datatables context function
+  and the output sent to the view for rendering as json.
+  Typically the routing entry would be setup under the :api scope.
 
       defmodule PhoenixDatatablesExampleWeb.ItemTableController do
         use PhoenixDatatablesExampleWeb, :controller
@@ -70,16 +71,17 @@ defmodule PhoenixDatatables do
 
   ## View
 
-  Just like with any Phoenix json method, a loaded Ecto schema cannot be serialized directly
-  to json. There are two solutions: Either the Ecto query needs to use a select to return
+  As with any Phoenix json method, a loaded Ecto schema cannot be serialized directly
+  to json by `Poison`. There are two solutions: Either the Ecto query needs to use a select to return
   a plain map, e.g.
 
-    from item in Item,
-      select: %{
-        nsn: item.nsn,
-        rep_office: item.rep_office,
-        ...
-      }
+
+      from item in Item,
+        select: %{
+          nsn: item.nsn,
+          rep_office: item.rep_office,
+          ...
+        }
 
 
   Or a map function is required to transform the results in the view. This is preferred if other
@@ -105,6 +107,8 @@ defmodule PhoenixDatatables do
 
   The client uses jQuery and datatables.net packages; those need to be in your `package.json`.
 
+  Brunch needs to be configured to include styles and images from the datatables.net NPM package.
+
   A very basic client implementation might look something like the below - what is most important
   is that `serverSide: true` is set and the `ajax: ` option is set to the correct route based on your entry in `router.ex`.
 
@@ -112,6 +116,33 @@ defmodule PhoenixDatatables do
   that can be used to customize rendering and enable various features - please refer to the
   excellent manual, references and community content available throught the DataTables
   [website](https://datatables.net/manual/server-side).
+
+    `package.json`
+
+      "dependencies": {
+        "jquery": "^3.2.1",
+        "datatables.net": "^1.10.15",
+        "datatables.net-dt": "^1.10.15"
+      },
+
+      "devDependencies": {
+        "copycat-brunch": "^1.1.0"
+      }
+
+    `brunch-config.js`
+
+      npm: {
+        enabled: true,
+        styles: {
+          'datatables.net-dt': [ 'css/jquery.dataTables.css' ],
+        }
+      }
+
+      plugins: {
+        copycat: {
+          'images': [ 'node_modules/datatables.net-dt/images' ],
+      },
+
 
     `index.html.eex`
 
@@ -130,6 +161,8 @@ defmodule PhoenixDatatables do
       </thead>
     </table>
     ```
+
+    `app.js`
 
   ```javascript
   import $ from 'jquery';
@@ -173,29 +206,46 @@ defmodule PhoenixDatatables do
      query. This will not always work - Ecto queries may contain subqueries or schema-less queries.
      Such queryables will need to be accompanied by `:columns` options.
 
-     A list of valid columns that are eligibile to be used for sorting and filtering can be passed in
-     a nested keyword list, where the first keyword is the table name, and second is
-     the column name and query binding order.
+     &nbsp;
 
-     For example, suppose you have an items table that you join to a category table
-     to include the category name in your datatable. Your ecto query may look like:
 
-       query =
-         (from item in Item,
-         join: category in assoc(item, :category),
-         select: %{id: item.id, item.nsn, category_name: category.name})
+     Even if the queryable uses only schemas and joins built with `assoc` there are security reasons to
+     provide a `:columns` option.
 
-     This query can be interpreted automatically just fine as it is based on schemas and associations.
-     However there is another reason to specify `columns`. The client will provide columns
-     to use to filter and search in its request, but client input cannot be trusted. A denial of service
+     The client will provide columns
+     to use for filterng and searching in its request, but client input cannot be trusted. A denial of service
      attack could be constructed by requesting search against un-indexed fields on a large table for example.
      To harden your server you could limit the on the server-side the sorting and filtering possiblities
      by specifying the columns that should be available.
 
-     To limit order/where clauses to include only the NSN and category name, you could pass a `columns`
-     argument as `[nsn: 0, category: [name: 1]]`. Here the 0 means the nsn column belongs to the `from` table,
-     and there is a `category.name` field, which is the first join table in the query. In the client configuration,
+     &nbsp;
+
+     A list of valid columns that are eligibile to be used for sorting and filtering can be passed in
+     a nested keyword list, where the first keyword is the table name, and second is
+     the column name and query binding order.
+
+     &nbsp;
+
+     In the below example, the query is a simple join using assoc and could be introspected. `:columns` are
+     optional.
+
+     In the example, `columns` is bound to such a list. Here the 0 means the nsn column belongs to the `from` table,
+     and there is a `category.name` field, which is the first join table in the query. In the client datatables options,
      the column :data attribute should be set to `nsn` for the first column and `category.name` for the second.
+
+     &nbsp;
+
+      ```
+        query =
+          (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id, item.nsn, category_name: category.name})
+
+        columns = [nsn: 0, category: [name: 1]]
+
+        Repo.fetch_datatable(query, params, columns)
+      ```
+    &nbsp;
 
   """
   @spec execute(Ecto.Queryable.t, Conn.params, Ecto.Repo.t, Keyword.t | nil) :: Payload.t
@@ -203,8 +253,8 @@ defmodule PhoenixDatatables do
     params = Request.receive(params)
     total_entries = Query.total_entries(query, repo)
     filtered_query =
-      params
-      |> Query.sort(query, options[:columns])
+      query
+      |> Query.sort(params, options[:columns])
       |> Query.search(params, options)
       |> Query.paginate(params)
 

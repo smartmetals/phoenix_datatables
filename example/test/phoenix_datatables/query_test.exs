@@ -18,10 +18,8 @@ defmodule PhoenixDatatables.QueryTest do
       assert item2.id != nil
       assert item2.nsn < item1.nsn
 
-      query =
-        Factory.raw_request
-        |> Request.receive
-        |> Query.sort(Item, @sortable)
+      params = Factory.raw_request |> Request.receive
+      query = Query.sort(Item, params, @sortable)
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
@@ -34,10 +32,8 @@ defmodule PhoenixDatatables.QueryTest do
       assert item2.id != nil
       assert item2.nsn < item1.nsn
 
-      query =
-        Factory.raw_request
-        |> Request.receive
-        |> Query.sort(Item)
+      params = Factory.raw_request |> Request.receive
+      query = Query.sort(Item, params)
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
@@ -53,10 +49,8 @@ defmodule PhoenixDatatables.QueryTest do
         select: %{id: item.id, category_name: category.name})
 
       do_test = fn request ->
-        query =
-          request
-          |> Request.receive
-          |> Query.sort(query, @sortable_join)
+        params = request |> Request.receive
+        query = Query.sort(query, params, @sortable_join)
 
         [ritem2, ritem1] = query |> Repo.all
         assert item1.id == ritem1.id
@@ -76,10 +70,8 @@ defmodule PhoenixDatatables.QueryTest do
           join: category in assoc(item, :category),
           select: %{id: item.id, category_name: category.name})
 
-      query =
-        request
-        |> Request.receive
-        |> Query.sort(query)
+      params = request |> Request.receive
+      query = Query.sort(query, params)
 
       [ritem2, ritem1] = query |> Repo.all
       assert item1.id == ritem1.id
@@ -92,10 +84,8 @@ defmodule PhoenixDatatables.QueryTest do
                     "1" => %{"column" => "2", "dir" => "asc"}}
       request = %{Factory.raw_request | "order" => orderings}
 
-      query =
-        request
-        |> Request.receive
-        |> Query.sort(Item)
+      params = request |> Request.receive
+      query = Query.sort(Item, params)
 
       assert query.order_bys |> Enum.count == 2
     end
@@ -116,10 +106,8 @@ defmodule PhoenixDatatables.QueryTest do
                     unit_description: unit.description
         })
 
-      query =
-        request
-        |> Request.receive
-        |> Query.sort(query)
+      params = request |> Request.receive
+      query = Query.sort(query, params)
 
       assert query.order_bys |> Enum.count == 2
 

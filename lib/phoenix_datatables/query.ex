@@ -8,7 +8,13 @@ defmodule PhoenixDatatables.Query do
   alias PhoenixDatatables.Query.Attribute
   alias PhoenixDatatables.QueryException
 
-  def sort(params, queryable, sortable \\ nil)
+  @doc """
+  Add order_by clauses to the provided queryable based on the "order" params provided
+  in the Datatables request.
+  For some queries, `:columns` need to be passed - see documentation for `PhoenixDatatables.execute`
+  for details.
+  """
+  def sort(queryable, params, sortable \\ nil)
   def sort(%Params{order: orders} = params, queryable, sortable) when is_list(sortable) do
     sorts =
       for order <- orders do
@@ -21,7 +27,7 @@ defmodule PhoenixDatatables.Query do
       end
     do_sorts(queryable, sorts)
   end
-  def sort(%Params{order: orders} = params, queryable, _sortable) do
+  def sort(queryable, %Params{order: orders} = params, _sortable) do
     schema = schema(queryable)
     sorts =
       for order <- orders do
@@ -124,6 +130,10 @@ defmodule PhoenixDatatables.Query do
   defp cast_dir("desc"), do: :desc
   defp cast_dir(wrong), do: {:error, "#{wrong} is not a valid sort order."}
 
+  @doc """
+  Add offset and limit clauses to the provided queryable based on the "length" and
+  "start" parameters passed in the Datatables request.
+  """
   def paginate(queryable, params) do
     length = convert_to_number_if_string(params.length)
     start = convert_to_number_if_string(params.start)
@@ -142,6 +152,12 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
+  @doc """
+  Add AND where clause to the provided queryable based on the "search" parameter passed
+  in the Datatables request.
+  For some queries, `:columns` need to be passed - see documentation for `PhoenixDatatables.execute`
+  for details.
+  """
   def search(queryable, params, options \\ []) do
     columns = options[:columns]
     do_search(queryable, params, columns)
