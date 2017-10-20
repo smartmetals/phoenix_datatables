@@ -7,7 +7,7 @@ defmodule PhoenixDatatablesExample.Stock do
   alias PhoenixDatatablesExample.Repo
   alias PhoenixDatatablesExample.Stock.Item
 
-  def items_datatable(params) do
+  def datatable_items(params) do
     Repo.fetch_datatable(Item, params)
   end
 

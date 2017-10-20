@@ -38,7 +38,7 @@ defmodule PhoenixDatatables do
         alias PhoenixDatatablesExample.Repo
         alias PhoenixDatatablesExample.Stock.Item
 
-        def items_datatable(params) do
+        def datatable_items(params) do
           Repo.fetch_datatable(Item, params)
         end
       end
@@ -47,7 +47,7 @@ defmodule PhoenixDatatables do
 
   The controller is just like any other Phoenix json controller - the raw params request
   just needs to be passed to the datatables function and the output returned
-  to the view. Typically the routing entry would setup under the :api scope.
+  to the view. Typically the routing entry would be setup under the :api scope.
 
       defmodule PhoenixDatatablesExampleWeb.ItemTableController do
         use PhoenixDatatablesExampleWeb, :controller
@@ -56,7 +56,7 @@ defmodule PhoenixDatatables do
         action_fallback PhoenixDatatablesExampleWeb.FallbackController
 
         def index(conn, params) do
-          render(conn, :index, payload: Stock.items_datatable(params))
+          render(conn, :index, payload: Stock.datatable_items(params))
         end
       end
 
@@ -66,6 +66,39 @@ defmodule PhoenixDatatables do
         pipe_through :api
 
         get "/items", ItemTableController, :index
+      end
+
+  ## View
+
+  Just like with any Phoenix json method, a loaded Ecto schema cannot be serialized directly
+  to json. There are two solutions: Either the Ecto query needs to use a select to return
+  a plain map, e.g.
+
+    from item in Item,
+      select: %{
+        nsn: item.nsn,
+        rep_office: item.rep_office,
+        ...
+      }
+
+
+  Or a map function is required to transform the results in the view. This is preferred if other
+  transformations are also required.
+
+      def render("index.json", %{payload: payload}) do
+        PhoenixDatatables.map_payload(payload, &item_json/1)
+      end
+
+      def item_json(item) do
+        %{
+          nsn: item.nsn,
+          rep_office: item.rep_office,
+          common_name: item.common_name,
+          description: item.description,
+          price: item.price,
+          ui: item.ui,
+          aac: item.aac
+        }
       end
 
   ## Client

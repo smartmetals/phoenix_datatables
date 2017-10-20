@@ -5,6 +5,6 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableController do
   action_fallback PhoenixDatatablesExampleWeb.FallbackController
 
   def index(conn, params) do
-    render(conn, :index, payload: Stock.items_datatable(params))
+    render(conn, :index, payload: Stock.datatable_items(params))
   end
 end

@@ -1,11 +1,8 @@
 defmodule PhoenixDatatablesExampleWeb.ItemTableView do
   use PhoenixDatatablesExampleWeb, :view
-  alias PhoenixDatatables.Response.Payload
 
   def render("index.json", %{payload: payload}) do
-    %Payload{ payload |
-      data: Enum.map(payload.data, &item_json/1)
-    }
+    PhoenixDatatables.map_payload(payload, &item_json/1)
   end
 
   def item_json(item) do
