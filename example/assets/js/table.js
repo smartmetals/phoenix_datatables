@@ -11,7 +11,7 @@ export default function() {
     $('[data-datatable-server]').dataTable({
       lengthChange: false,
       serverSide: true,
-      ajax: 'api/items',
+      ajax: 'datatables/items',
       columns: [
         { data: "nsn" },
         { data: "rep_office" },
