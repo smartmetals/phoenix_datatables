@@ -14,12 +14,8 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableView do
       price: item.price,
       ui: item.ui,
       aac: item.aac,
-      unit: %{
-        description: item.unit.description
-      },
-      category: %{
-        name: item.category.name
-      }
+      unit_description: item.unit.description,
+      category_name: item.category.name,
     }
   end
 

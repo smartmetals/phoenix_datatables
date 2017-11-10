@@ -11,11 +11,11 @@ export default function() {
       ajax: 'datatables/items',
       columns: [
         { data: "nsn" },
-        { data: "category.name" },
+        { data: "category_name", name: "category.name"},
         { data: "common_name" },
         { data: "description" },
         { data: "price" },
-        { data: "unit.description" },
+        { data: "unit_description", name: "unit.description" },
         { data: "aac" },
       ]
     });
