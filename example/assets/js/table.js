@@ -4,9 +4,6 @@ import dt from 'datatables.net';
 export default function() {
   $(document).ready(() => {
     dt();
-    $('[data-datatable]').dataTable({
-      lengthChange: false,
-    });
 
     $('[data-datatable-server]').dataTable({
       lengthChange: false,
@@ -14,12 +11,12 @@ export default function() {
       ajax: 'datatables/items',
       columns: [
         { data: "nsn" },
-        { data: "rep_office" },
+        { data: "category.name" },
         { data: "common_name" },
         { data: "description" },
         { data: "price" },
-        { data: "ui" },
-        { data: "aac" }
+        { data: "unit.description" },
+        { data: "aac" },
       ]
     });
   })
