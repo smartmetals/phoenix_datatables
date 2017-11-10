@@ -211,6 +211,75 @@ $(document).ready(() => {
 };
 ```
 
+## Joins
+
+Ecto queryables using joins are supported with automatic introspection - meaning columns used in the DataTable will be sortable and searchable if they are specified appropriately in the client-side configuration. The `example/` project in the source repo works this way.
+
+Assuming an Ecto queryable that looks like:
+
+```elixir
+    query =
+      from item in Item,
+      join: category in assoc(item, :category),
+      join: unit in assoc(item, :unit),
+      preload: [category: category, unit: unit]
+```
+
+And a view transformation that looks like: 
+
+```elixir
+  def item_json(item) do
+    %{
+      nsn: item.nsn,
+      rep_office: item.rep_office,
+      common_name: item.common_name,
+      description: item.description,
+      price: item.price,
+      ui: item.ui,
+      aac: item.aac,
+      unit_description: item.unit.description,
+      category_name: item.category.name,
+    }
+  end
+```
+
+Could be used with a client-side configuration that looks like:
+```javascript
+      columns: [
+        { data: "nsn" },
+        { data: "category_name", name: "category.name"},
+        { data: "common_name" },
+        { data: "description" },
+        { data: "price" },
+        { data: "unit_description", name: "unit.description" },
+        { data: "aac" },
+      ]
+    });
+```
+
+You'll notice this differs from the basic configuration in that a `name` attribute is specified with the qualified column name. You could alternatively use the value `unit.description` in the `data` attribute and not supply a name attribute, but then the DataTables client library will expect to find a nested structure in the response message, so your view would have to nest it e.g.: 
+
+```elixir
+  def item_json(item) do
+    %{
+      nsn: item.nsn,
+      rep_office: item.rep_office,
+      common_name: item.common_name,
+      description: item.description,
+      price: item.price,
+      ui: item.ui,
+      aac: item.aac,
+      unit: %{
+        description: item.unit.description
+      },
+      category: %{
+        name: item.category.name
+      },
+    }
+  end
+```
+
+The important thing to understand is that when a `name` attribute is supplied, the server uses that to identify the field to search / sort - regardless of the value of the `data` attribute. The *client* library always uses `data` to identify the data path to map the response into the generated HTML. The client uses the `name` attribute only to make it easier to refer to columns by name in scripts using the client API.
 
 ## Credits
 

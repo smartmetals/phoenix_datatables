@@ -8,7 +8,12 @@ defmodule PhoenixDatatablesExample.Stock do
   alias PhoenixDatatablesExample.Stock.Item
 
   def datatable_items(params) do
-    Repo.fetch_datatable(Item, params)
+    query =
+      from item in Item,
+      join: category in assoc(item, :category),
+      join: unit in assoc(item, :unit),
+      preload: [category: category, unit: unit]
+    Repo.fetch_datatable(query, params)
   end
 
   @doc """

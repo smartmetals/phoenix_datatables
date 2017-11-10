@@ -31,7 +31,6 @@ defmodule PhoenixDatatables.Request.Column do
   @moduledoc false
   defstruct [
     :data,
-    :name,
     :searchable,
     :orderable,
     :search
@@ -58,9 +57,13 @@ defmodule PhoenixDatatables.Request do
       end
     columns =
       Map.new (for {key, val} <- params["columns"] do
+        data = case val["name"] do
+                "" -> val["data"]
+                name when is_binary(name) -> name
+                _ -> val["data"]
+              end
         {key, %Column{
-          data: val["data"],
-          name: val["name"],
+          data: data,
           searchable: val["searchable"] == "true",
           orderable: val["orderable"] == "true",
           search: %Search{value: val["search"]["value"], regex: val["search"]["regex"]}

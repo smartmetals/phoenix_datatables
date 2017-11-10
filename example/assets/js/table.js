@@ -4,22 +4,19 @@ import dt from 'datatables.net';
 export default function() {
   $(document).ready(() => {
     dt();
-    $('[data-datatable]').dataTable({
-      lengthChange: false,
-    });
 
     $('[data-datatable-server]').dataTable({
       lengthChange: false,
       serverSide: true,
-      ajax: 'api/items',
+      ajax: 'datatables/items',
       columns: [
         { data: "nsn" },
-        { data: "rep_office" },
+        { data: "category_name", name: "category.name"},
         { data: "common_name" },
         { data: "description" },
         { data: "price" },
-        { data: "ui" },
-        { data: "aac" }
+        { data: "unit_description", name: "unit.description" },
+        { data: "aac" },
       ]
     });
   })

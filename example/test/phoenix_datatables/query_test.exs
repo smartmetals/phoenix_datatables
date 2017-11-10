@@ -79,6 +79,25 @@ defmodule PhoenixDatatables.QueryTest do
 
     end
 
+    test "appends order-by clause to a joined table with name attribute" do
+      [item1, item2] = add_items()
+
+      request = %{Factory.raw_request | "order" => %{"0" => %{"column" => "7", "dir" => "asc"}}}
+      request = put_in(request, ["columns", "7", "data"], "category_name")
+      request = put_in(request, ["columns", "7", "name"], "category.name")
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name})
+
+      params = request |> Request.receive
+      query = Query.sort(query, params)
+
+      [ritem2, ritem1] = query |> Repo.all
+      assert item1.id == ritem1.id
+      assert item2.id == ritem2.id
+    end
+
     test "appends multiple order-by clause to a table" do
       orderings = %{"0" => %{"column" => "1", "dir" => "asc"},
                     "1" => %{"column" => "2", "dir" => "asc"}}
