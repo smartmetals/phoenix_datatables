@@ -219,7 +219,6 @@ defmodule PhoenixDatatables.Query do
     total_entries =
       queryable
       |> exclude(:preload)
-      |> exclude(:select)
       |> exclude(:order_by)
       |> exclude(:limit)
       |> exclude(:offset)
