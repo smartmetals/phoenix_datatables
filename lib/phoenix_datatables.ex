@@ -50,15 +50,20 @@ defmodule PhoenixDatatables do
 
      &nbsp;
 
+
+  * `:total_entries` - Provides a way for the application to use cached values for total_entries; when this
+     is provided, `phoenix_datatables` won't do a query to get the total record count, instead using
+     the provided value in the response. The mechanism for cacheing is left up to the application.
+
       ```
         query =
           (from item in Item,
           join: category in assoc(item, :category),
           select: %{id: item.id, item.nsn, category_name: category.name})
 
-        columns = [nsn: 0, category: [name: 1]]
+        options = [columns: [nsn: 0, category: [name: 1]], total_entries: 25]
 
-        Repo.fetch_datatable(query, params, columns)
+        Repo.fetch_datatable(query, params, options)
       ```
     &nbsp;
 
@@ -69,14 +74,19 @@ defmodule PhoenixDatatables do
                 Keyword.t | nil) :: Payload.t
   def execute(query, params, repo, options \\ []) do
     params = Request.receive(params)
-    total_entries = Query.total_entries(query, repo)
+    total_entries = options[:total_entries] || Query.total_entries(query, repo)
     filtered_query =
       query
       |> Query.sort(params, options[:columns])
       |> Query.search(params, options)
       |> Query.paginate(params)
 
-    filtered_entries = Query.total_entries(filtered_query, repo)
+    filtered_entries =
+      if params.search.value == "" do
+        total_entries
+      else
+        Query.total_entries(filtered_query, repo)
+      end
 
     filtered_query
     |> repo.all()

@@ -7,8 +7,8 @@ defmodule PhoenixDatatablesTest do
   alias PhoenixDatatablesExample.Stock.Category
   alias PhoenixDatatablesExample.Factory
 
-  @sortable [:nsn, :common_name]
-  @sortable_join [nsn: 0, common_name: 0, category: [name: 1]]
+  @sortable [columns: [:nsn, :common_name]]
+  @sortable_join [columns: [nsn: 0, common_name: 0, category: [name: 1]]]
 
   describe "execute" do
     test "do all of the things in phoenix datatables" do
@@ -44,6 +44,18 @@ defmodule PhoenixDatatablesTest do
         recordsFiltered: _recordsFiltered,
         recordsTotal: _recordsTotal
       } = PhoenixDatatables.execute(query, request, Repo, @sortable_join)
+      assert draw == request["draw"]
+    end
+
+    test "will override records total with total_entries option" do
+      { request, query } = create_request_and_query()
+      assert %Payload{
+        data: _data,
+        draw: draw,
+        error: _error,
+        recordsFiltered: _recordsFiltered,
+        recordsTotal: 25
+      } = PhoenixDatatables.execute(query, request, Repo, [total_entries: 25])
       assert draw == request["draw"]
     end
   end
