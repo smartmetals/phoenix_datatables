@@ -3,6 +3,6 @@ defmodule PhoenixDatatablesExampleWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"
-    assert redirected_to(conn) == item_path(conn, :index)
+    assert redirected_to(conn) == Routes.item_path(conn, :index)
   end
 end

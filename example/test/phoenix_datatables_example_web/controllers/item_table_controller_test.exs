@@ -24,7 +24,7 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableControllerTest do
 
   describe "index" do
     test "lists all items_tables", %{conn: conn} do
-      conn = get conn, item_table_path(conn, :index), Factory.raw_request
+      conn = get conn, Routes.item_table_path(conn, :index), Factory.raw_request
       assert json_response(conn, 200)["data"] |> List.first |> Map.get("nsn") == "NSN1"
     end
   end

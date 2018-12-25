@@ -21,8 +21,9 @@ defmodule PhoenixDatatablesExampleWeb do
     quote do
       use Phoenix.Controller, namespace: PhoenixDatatablesExampleWeb
       import Plug.Conn
-      import PhoenixDatatablesExampleWeb.Router.Helpers
+      
       import PhoenixDatatablesExampleWeb.Gettext
+      alias PhoenixDatatablesExampleWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -36,10 +37,10 @@ defmodule PhoenixDatatablesExampleWeb do
 
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
-
-      import PhoenixDatatablesExampleWeb.Router.Helpers
+      
       import PhoenixDatatablesExampleWeb.ErrorHelpers
       import PhoenixDatatablesExampleWeb.Gettext
+      alias PhoenixDatatablesExampleWeb.Router.Helpers, as: Routes
     end
   end
 

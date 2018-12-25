@@ -39,5 +39,5 @@
 
 </ul>
 
-<span><%= link "Edit", to: item_path(@conn, :edit, @item) %></span>
-<span><%= link "Back", to: item_path(@conn, :index) %></span>
+<span><%= link "Edit", to: Routes.item_path(@conn, :edit, @item) %></span>
+<span><%= link "Back", to: Routes.item_path(@conn, :index) %></span>

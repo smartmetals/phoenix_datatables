@@ -10,8 +10,9 @@
       <th>Price</th>
       <th>Ui</th>
       <th>Aac</th>
+      <th></th>
     </tr>
   </thead>
 </table>
 
-<span><%= link "New Item", to: item_path(@conn, :new) %></span>
+<span><%= link "New Item", to: Routes.item_path(@conn, :new) %></span>
