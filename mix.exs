@@ -5,7 +5,7 @@ defmodule PhoenixDatatables.Mixfile do
     [
       app: :phoenix_datatables,
       version: "0.2.1",
-      elixir: "~> 1.4",
+      elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),
       docs: [main: "readme", extras: ["README.md"]],
@@ -29,7 +29,8 @@ defmodule PhoenixDatatables.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:ecto, "~> 2.1"},
+      # {:ecto, "~> 2.1"},
+      {:ecto_sql, "~> 3.0"},
       {:ex_doc, "~> 0.16", only: :dev},
       {:plug, "~> 1.4", only: :dev}, #only used in specs/docs
       {:dialyxir, "~> 0.5", only: :dev, runtime: false},
