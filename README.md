@@ -126,8 +126,6 @@ end
 
   The client uses jQuery and datatables.net packages; those need to be in your `package.json`.
 
-  Brunch needs to be configured to include styles and images from the datatables.net NPM package.
-
   A very basic client implementation might look something like the below - what is most important
   is that `serverSide: true` is set and the `ajax: ` option is set to the correct route based on your entry in `router.ex`.
 
@@ -149,24 +147,6 @@ end
   "devDependencies": {
     "copycat-brunch": "^1.1.0"
   }
-```
-
-`brunch-config.js`
-    
-```javascript
-
-  npm: {
-    enabled: true,
-    styles: {
-      'datatables.net-dt': [ 'css/jquery.dataTables.css' ],
-    }
-  }
-
-  plugins: {
-    copycat: {
-      'images': [ 'node_modules/datatables.net-dt/images' ],
-  },
-
 ```
 
 `index.html.eex`
