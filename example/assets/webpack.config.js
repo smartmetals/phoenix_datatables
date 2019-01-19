@@ -21,6 +21,7 @@ module.exports = (env, options) => ({
   },
   module: {
     rules: [
+      { test: /\.png$/, loader: "url-loader?mimetype=image/png" },
       {
         test: /\.js$/,
         exclude: /node_modules/,
