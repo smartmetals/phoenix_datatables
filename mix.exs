@@ -4,7 +4,7 @@ defmodule PhoenixDatatables.Mixfile do
   def project do
     [
       app: :phoenix_datatables,
-      version: "0.2.1",
+      version: "0.3.0",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),
