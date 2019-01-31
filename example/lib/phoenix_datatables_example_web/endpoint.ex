@@ -1,7 +1,9 @@
 defmodule PhoenixDatatablesExampleWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :phoenix_datatables_example
 
-  socket "/socket", PhoenixDatatablesExampleWeb.UserSocket
+  socket "/socket", PhoenixDatatablesExampleWeb.UserSocket,
+    websocket: true,
+    longpoll: false
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -25,7 +27,7 @@ defmodule PhoenixDatatablesExampleWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: Phoenix.json_library()
 
   plug Plug.MethodOverride
   plug Plug.Head

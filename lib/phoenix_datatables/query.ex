@@ -88,7 +88,7 @@ defmodule PhoenixDatatables.Query do
     """)
   end
 
-  defp schema(%Ecto.Query{} = query), do: query.from |> check_from() |> elem(1)
+  defp schema(%Ecto.Query{} = query), do: query.from.source |> check_from() |> elem(1)
   defp schema(schema) when is_atom(schema), do: schema
 
   defp check_from(%Ecto.SubQuery{}) do

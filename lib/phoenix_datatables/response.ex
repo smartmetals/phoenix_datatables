@@ -1,8 +1,9 @@
 defmodule PhoenixDatatables.Response.Payload do
   @moduledoc """
-  A struct which serialies with `Poison` to the json response expected by the
+  A struct which serialies with `Jason` to the json response expected by the
   Datatables client library.
   """
+  @derive {Jason.Encoder, only: [:draw, :recordsTotal, :recordsFiltered, :data, :error]}
   defstruct draw: 0,
             recordsTotal: 0,
             recordsFiltered: 0,

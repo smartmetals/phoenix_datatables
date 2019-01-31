@@ -19,7 +19,7 @@ defmodule PhoenixDatatablesExampleWeb.ConnCase do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
-      import PhoenixDatatablesExampleWeb.Router.Helpers
+      alias PhoenixDatatablesExampleWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
       @endpoint PhoenixDatatablesExampleWeb.Endpoint
