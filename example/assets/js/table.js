@@ -15,6 +15,7 @@ export default function() {
         { data: "price" },
         { data: "unit_description", name: "unit.description" },
         { data: "aac" },
+        { data: "nilable_field" },
       ]
     });
   })

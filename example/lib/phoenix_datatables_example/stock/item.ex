@@ -14,6 +14,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
     field :price, :float
     field :rep_office, :string
     field :ui, :string
+    field :nilable_field, :string
     belongs_to :category, Category
     belongs_to :unit, Unit
 
@@ -23,7 +24,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
   @doc false
   def changeset(%Item{} = item, attrs) do
     item
-    |> cast(attrs, [:nsn, :rep_office, :common_name, :description, :price, :ui, :aac, :category_id])
+    |> cast(attrs, [:nsn, :rep_office, :common_name, :description, :price, :ui, :aac, :category_id, :nilable_field])
     |> validate_required([:nsn, :rep_office, :common_name, :description, :price, :ui, :aac])
   end
 end
