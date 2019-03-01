@@ -48,6 +48,12 @@
   </div>
 
   <div class="form-group">
+    <%= label f, :nilable_field, class: "control-label" %>
+    <%= text_input f, :nilable_field, class: "form-control" %>
+    <%= error_tag f, :nilable_field %>
+  </div>
+
+  <div class="form-group">
     <%= submit "Submit", class: "btn btn-primary" %>
   </div>
 <% end %>
