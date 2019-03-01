@@ -77,7 +77,7 @@ defmodule PhoenixDatatables do
     total_entries = options[:total_entries] || Query.total_entries(query, repo)
     filtered_query =
       query
-      |> Query.sort(params, options[:columns])
+      |> Query.sort(params, options)
       |> Query.search(params, options)
       |> Query.paginate(params)
 

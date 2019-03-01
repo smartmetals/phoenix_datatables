@@ -17,21 +17,21 @@ defmodule PhoenixDatatables.Query do
   For some queries, `:columns` need to be passed - see documentation for `PhoenixDatatables.execute`
   for details.
   """
-  def sort(queryable, params, sortable \\ nil)
-  def sort(queryable, %Params{order: orders} = params, sortable) when is_list(sortable) do
+  def sort(queryable, params, options \\ nil)
+  def sort(queryable, %Params{order: orders} = params, [columns: columns] = options) when is_list(options) do
     sorts =
       for order <- orders do
         with dir when is_atom(dir) <- cast_dir(order.dir),
              %Column{} = column <- params.columns[order.column],
              true <- column.orderable,
              {column, join_index} when is_number(join_index)
-                                    <- cast_column(column.data, sortable) do
+                                    <- cast_column(column.data, columns) do
           {dir, column, join_index}
         end
       end
-    do_sorts(queryable, sorts)
+    do_sorts(queryable, sorts, options)
   end
-  def sort(queryable, %Params{order: orders} = params, _sortable) do
+  def sort(queryable, %Params{order: orders} = params, options) do
     schema = schema(queryable)
     sorts =
       for order <- orders do
@@ -44,12 +44,12 @@ defmodule PhoenixDatatables.Query do
           {dir, attribute.name, join_index}
         end
       end
-    do_sorts(queryable, sorts)
+    do_sorts(queryable, sorts, options)
   end
 
-  defp do_sorts(queryable, sorts) do
+  defp do_sorts(queryable, sorts, options) do
     Enum.reduce(sorts, queryable, fn {dir, column, join_index}, queryable ->
-      order_relation(queryable, join_index, dir, column)
+      order_relation(queryable, join_index, dir, column, options)
     end)
   end
 
