@@ -11,6 +11,7 @@ defmodule PhoenixDatatables.QueryTest do
   @sortable [:nsn, :common_name]
   @sortable_join [nsn: 0, category: [name: 1]]
   @sortable_nulls_last [nulls_last: true]
+  @sortable_no_nulls_last [nulls_last: false]
 
   describe "sort" do
     test "appends order-by clause to a single-table query specifying sortable fields" do
@@ -137,7 +138,7 @@ defmodule PhoenixDatatables.QueryTest do
       assert ritem3.unit_description == "Each"
     end
 
-    test "with nulls last" do
+    test "with nulls last: true" do
       original_items = add_items_with_nils()
       [item1, item2] = original_items
       assert item1.nilable_field == nil
@@ -161,6 +162,23 @@ defmodule PhoenixDatatables.QueryTest do
       [ritem1, ritem2] = query |> Repo.all
       assert ritem1.nilable_field != nil
       assert ritem2.nilable_field == nil
+    end
+
+    test "with nulls last: false" do
+      original_items = add_items_with_nils()
+      [item1, item2] = original_items
+      assert item1.nilable_field == nil
+      assert item2.nilable_field != nil
+
+      request = %{Factory.raw_request | "order" => %{"0" => %{"column" => "9", "dir" => "desc"}}}
+      query =
+        (from item in Item,
+          select: %{id: item.id, nilable_field: item.nilable_field})
+      params = request |> Request.receive
+      query = Query.sort(query, params, @sortable_no_nulls_last)
+      [ritem1, ritem2] = query |> Repo.all
+      assert ritem1.nilable_field == nil
+      assert ritem2.nilable_field != nil
     end
   end
 
