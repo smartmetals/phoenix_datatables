@@ -67,6 +67,7 @@ defmodule PhoenixDatatables do
       ```
     &nbsp;
 
+  * `:nulls_last` - When `true`, results will be sorted with NULL fields sorted last.
   """
   @spec execute(Ecto.Queryable.t,
                 Conn.params,
