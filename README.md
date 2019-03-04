@@ -6,7 +6,7 @@
   Add this to your `mix.exs` dependency list:
 
 ```elixir
-{:phoenix_datatables, "~> 0.2.0"}
+{:phoenix_datatables, "~> 0.4.0"}
 ```
 
   There is a complete [example](https://github.com/smartmetals/phoenix_datatables/tree/master/example).
