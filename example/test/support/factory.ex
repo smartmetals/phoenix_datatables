@@ -7,7 +7,8 @@ defmodule PhoenixDatatablesExample.Factory do
       description: "you know - pots",
       price: 12.65,
       ui: "EA",
-      aac: "H"
+      aac: "H",
+      nilable_field: nil
     }
   end
 
@@ -24,7 +25,8 @@ defmodule PhoenixDatatablesExample.Factory do
           "5" => %{"data" => "ui", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "6" => %{"data" => "aac", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "7" => %{"data" => "category.name", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-          "8" => %{"data" => "unit.description", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
+          "8" => %{"data" => "unit.description", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+          "9" => %{"data" => "nilable_field", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
         },
       "draw" => "1",
       "length" => "10",

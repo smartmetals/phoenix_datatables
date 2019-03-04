@@ -67,6 +67,8 @@ defmodule PhoenixDatatables do
       ```
     &nbsp;
 
+  * `:nulls_last` - When `true`, results will be sorted with NULL fields sorted last. This option is only
+    valid with PostgreSQL.
   """
   @spec execute(Ecto.Queryable.t,
                 Conn.params,
@@ -77,7 +79,7 @@ defmodule PhoenixDatatables do
     total_entries = options[:total_entries] || Query.total_entries(query, repo)
     filtered_query =
       query
-      |> Query.sort(params, options[:columns])
+      |> Query.sort(params, options)
       |> Query.search(params, options)
       |> Query.paginate(params)
 

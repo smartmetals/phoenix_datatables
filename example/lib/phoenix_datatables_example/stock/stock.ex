@@ -13,7 +13,7 @@ defmodule PhoenixDatatablesExample.Stock do
       join: category in assoc(item, :category),
       join: unit in assoc(item, :unit),
       preload: [category: category, unit: unit]
-    Repo.fetch_datatable(query, params)
+    Repo.fetch_datatable(query, params, nulls_last: true)
   end
 
   @doc """

@@ -15,8 +15,23 @@ defmodule PhoenixDatatables.Query.Macros do
   defp def_order_relation(num) do
     bindings = bind_number(num)
     quote do
-      defp order_relation(queryable, unquote(num), dir, column) do
+      defp nulls_last(options) when is_list(options) do
+        if Keyword.has_key?(options, :nulls_last) do
+          options[:nulls_last]
+        else
+          false
+        end
+      end
+
+      defp order_relation(queryable, unquote(num), dir, column, nil) do
         order_by(queryable, unquote(bindings), [{^dir, field(t, ^column)}])
+      end
+      defp order_relation(queryable, unquote(num), dir, column, options) when is_list(options) do
+        if dir == :desc && nulls_last(options) do
+          order_by(queryable, unquote(bindings), [fragment("? DESC NULLS LAST", field(t, ^column))])
+        else
+          order_relation(queryable, unquote(num), dir, column, nil)
+        end
       end
     end
   end

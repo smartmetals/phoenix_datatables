@@ -11,6 +11,7 @@ defmodule PhoenixDatatables.Fixtures.Stock.Item do
     field :price, :float
     field :rep_office, :string
     field :ui, :string
+    field :nilable_field, :string
     belongs_to :category, Category
     belongs_to :unit, Unit
   end
@@ -51,7 +52,8 @@ defmodule PhoenixDatatables.Fixtures.Factory do
           "5" => %{"data" => "ui", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "6" => %{"data" => "aac", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "7" => %{"data" => "category.name", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-          "8" => %{"data" => "unit.description", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
+          "8" => %{"data" => "unit.description", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+          "9" => %{"data" => "nilable_field", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
         },
       "draw" => "1",
       "length" => "10",
@@ -74,7 +76,8 @@ defmodule PhoenixDatatables.Fixtures.Factory do
           "5" => %{"data" => "ui", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "6" => %{"data" => "aac", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
           "7" => %{"data" => "category", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
-          "8" => %{"data" => "unit", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
+          "8" => %{"data" => "unit", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"},
+          "9" => %{"data" => "nilable_field", "name" => "", "orderable" => "true", "search" => %{"regex" => "false", "value" => ""}, "searchable" => "true"}
         },
       "draw" => "1",
       "length" => "10",
