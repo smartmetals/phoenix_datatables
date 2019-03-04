@@ -37,6 +37,11 @@
     <%= @item.aac %>
   </li>
 
+  <li>
+    <strong>Nilable:</strong>
+    <%= @item.nilable_field %>
+  </li>
+
 </ul>
 
 <span><%= link "Edit", to: Routes.item_path(@conn, :edit, @item) %></span>

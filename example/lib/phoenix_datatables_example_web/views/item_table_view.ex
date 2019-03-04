@@ -16,6 +16,7 @@ defmodule PhoenixDatatablesExampleWeb.ItemTableView do
       aac: item.aac,
       unit_description: item.unit.description,
       category_name: item.category.name,
+      nilable_field: item.nilable_field
     }
   end
 

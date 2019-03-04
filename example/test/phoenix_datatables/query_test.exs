@@ -10,6 +10,8 @@ defmodule PhoenixDatatables.QueryTest do
 
   @sortable [:nsn, :common_name]
   @sortable_join [nsn: 0, category: [name: 1]]
+  @sortable_nulls_last [nulls_last: true]
+  @sortable_no_nulls_last [nulls_last: false]
 
   describe "sort" do
     test "appends order-by clause to a single-table query specifying sortable fields" do
@@ -136,6 +138,48 @@ defmodule PhoenixDatatables.QueryTest do
       assert ritem3.unit_description == "Each"
     end
 
+    test "with nulls last: true" do
+      original_items = add_items_with_nils()
+      [item1, item2] = original_items
+      assert item1.nilable_field == nil
+      assert item2.nilable_field != nil
+
+      request = %{Factory.raw_request | "order" => %{"0" => %{"column" => "9", "dir" => "desc"}}}
+      query =
+        (from item in Item,
+          select: %{id: item.id, nilable_field: item.nilable_field})
+      params = request |> Request.receive
+      query = Query.sort(query, params)
+      [ritem1, ritem2] = query |> Repo.all
+      assert ritem1.nilable_field == nil
+      assert ritem2.nilable_field != nil
+
+      query =
+        (from item in Item,
+          select: %{id: item.id, nilable_field: item.nilable_field})
+      params = request |> Request.receive
+      query = Query.sort(query, params, @sortable_nulls_last)
+      [ritem1, ritem2] = query |> Repo.all
+      assert ritem1.nilable_field != nil
+      assert ritem2.nilable_field == nil
+    end
+
+    test "with nulls last: false" do
+      original_items = add_items_with_nils()
+      [item1, item2] = original_items
+      assert item1.nilable_field == nil
+      assert item2.nilable_field != nil
+
+      request = %{Factory.raw_request | "order" => %{"0" => %{"column" => "9", "dir" => "desc"}}}
+      query =
+        (from item in Item,
+          select: %{id: item.id, nilable_field: item.nilable_field})
+      params = request |> Request.receive
+      query = Query.sort(query, params, @sortable_no_nulls_last)
+      [ritem1, ritem2] = query |> Repo.all
+      assert ritem1.nilable_field == nil
+      assert ritem2.nilable_field != nil
+    end
   end
 
   describe "paginate" do
@@ -267,6 +311,17 @@ defmodule PhoenixDatatables.QueryTest do
     item = Map.put(Factory.item, :category_id, category_b.id)
     item2 = Map.put(Factory.item, :category_id, category_a.id)
     item2 = %{item2 | nsn: "1NSN"}
+    one = insert_item! item
+    two = insert_item! item2
+    [one, two]
+  end
+
+  def add_items_with_nils do
+    category_a = insert_category!("A")
+    category_b = insert_category!("B")
+    item = Map.put(Factory.item, :category_id, category_a.id)
+    item2 = Map.put(Factory.item, :category_id, category_b.id)
+    item2 = %{item2 | nilable_field: "not nil"}
     one = insert_item! item
     two = insert_item! item2
     [one, two]
