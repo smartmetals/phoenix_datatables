@@ -17,34 +17,40 @@ defmodule PhoenixDatatables.Query do
   For some queries, `:columns` need to be passed - see documentation for `PhoenixDatatables.execute`
   for details.
   """
-  def sort(queryable, params, options \\ nil)
-  def sort(queryable, %Params{order: orders} = params, [columns: columns] = options) when is_list(options) do
+  def sort(queryable, params, options \\ nil) do
     sorts =
-      for order <- orders do
-        with dir when is_atom(dir) <- cast_dir(order.dir),
-             %Column{} = column <- params.columns[order.column],
-             true <- column.orderable,
-             {column, join_index} when is_number(join_index)
-                                    <- cast_column(column.data, columns) do
-          {dir, column, join_index}
-        end
+      if options && Keyword.has_key?(options, :columns) do
+        build_column_sorts(params, options[:columns])
+      else
+        build_schema_sorts(queryable, params)
       end
     do_sorts(queryable, sorts, options)
   end
-  def sort(queryable, %Params{order: orders} = params, options) do
-    schema = schema(queryable)
-    sorts =
-      for order <- orders do
-        with dir when is_atom(dir) <- cast_dir(order.dir),
-             %Column{} = column <- params.columns[order.column],
-             true <- column.orderable,
-             %Attribute{} = attribute <- Attribute.extract(column.data, schema),
-               join_index when is_number(join_index)
-                           <- join_order(queryable, attribute.parent) do
-          {dir, attribute.name, join_index}
-        end
+
+  defp build_column_sorts(%Params{order: orders} = params, columns) do
+    for order <- orders do
+      with dir when is_atom(dir) <- cast_dir(order.dir),
+            %Column{} = column <- params.columns[order.column],
+            true <- column.orderable,
+            {column, join_index} when is_number(join_index)
+                                  <- cast_column(column.data, columns) do
+        {dir, column, join_index}
       end
-    do_sorts(queryable, sorts, options)
+    end
+  end
+
+  defp build_schema_sorts(queryable, %Params{order: orders} = params) do
+    schema = schema(queryable)
+    for order <- orders do
+      with dir when is_atom(dir) <- cast_dir(order.dir),
+            %Column{} = column <- params.columns[order.column],
+            true <- column.orderable,
+            %Attribute{} = attribute <- Attribute.extract(column.data, schema),
+              join_index when is_number(join_index)
+                          <- join_order(queryable, attribute.parent) do
+        {dir, attribute.name, join_index}
+      end
+    end
   end
 
   defp do_sorts(queryable, sorts, options) do
