@@ -152,9 +152,13 @@ defmodule PhoenixDatatables.Query do
     length = convert_to_number_if_string(params.length)
     start = convert_to_number_if_string(params.start)
 
-    queryable
-    |> limit(^length)
-    |> offset(^start)
+    if length == -1 do
+      queryable
+    else
+      queryable
+      |> limit(^length)
+      |> offset(^start)
+    end
   end
 
   defp convert_to_number_if_string(num) do
