@@ -32,7 +32,8 @@ defmodule PhoenixDatatables.Mixfile do
       {:ecto_sql, "~> 3.0"},
       {:ex_doc, "~> 0.16", only: :dev},
       {:plug, "~> 1.4", only: :dev}, #only used in specs/docs
-      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.6", only: :dev, runtime: false},
+      {:jason, "~> 1.1"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
     ]
   end
