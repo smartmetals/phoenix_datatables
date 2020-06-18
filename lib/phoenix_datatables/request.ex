@@ -52,7 +52,7 @@ defmodule PhoenixDatatables.Request do
   """
   def receive(params) do
     orders =
-      for {_key, val} <- params["order"] do
+      for {_key, val} <- params["order"] || [] do
         %Order{column: val["column"], dir: val["dir"]}
       end
     columns =
