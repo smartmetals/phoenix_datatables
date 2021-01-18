@@ -247,7 +247,7 @@ defmodule PhoenixDatatables.Query do
 
   def search_columns(queryable, params, options \\ []) do
     if has_column_search?(params.columns) do
-      columns = options[:columns]
+      columns = options[:columns] || []
       do_search_columns(queryable, params, columns)
     else
       queryable
