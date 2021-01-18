@@ -4,10 +4,11 @@ defmodule PhoenixDatatables do
     by the `Repo.fetch_datatable` function and directly by client applications.
   """
 
-  alias PhoenixDatatables.Request
   alias PhoenixDatatables.Query
+  alias PhoenixDatatables.Request
   alias PhoenixDatatables.Response
   alias PhoenixDatatables.Response.Payload
+
   alias Plug.Conn
 
   @doc """
@@ -50,7 +51,6 @@ defmodule PhoenixDatatables do
 
      &nbsp;
 
-
   * `:total_entries` - Provides a way for the application to use cached values for total_entries; when this
      is provided, `phoenix_datatables` won't do a query to get the total record count, instead using
      the provided value in the response. The mechanism for cacheing is left up to the application.
@@ -81,6 +81,7 @@ defmodule PhoenixDatatables do
       query
       |> Query.sort(params, options)
       |> Query.search(params, options)
+      |> Query.search_columns(params, options)
       |> Query.paginate(params)
 
     filtered_entries =
