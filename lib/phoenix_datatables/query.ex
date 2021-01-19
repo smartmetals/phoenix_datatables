@@ -5,11 +5,11 @@ defmodule PhoenixDatatables.Query do
   import Ecto.Query
   use PhoenixDatatables.Query.Macros
   alias Ecto.Query.JoinExpr
-  alias PhoenixDatatables.Request.Params
-  alias PhoenixDatatables.Request.Column
-  alias PhoenixDatatables.Request.Search
   alias PhoenixDatatables.Query.Attribute
   alias PhoenixDatatables.QueryException
+  alias PhoenixDatatables.Request.Column
+  alias PhoenixDatatables.Request.Params
+  alias PhoenixDatatables.Request.Search
 
   @doc """
   Add order_by clauses to the provided queryable based on the "order" params provided
@@ -24,16 +24,17 @@ defmodule PhoenixDatatables.Query do
       else
         build_schema_sorts(queryable, params)
       end
+
     do_sorts(queryable, sorts, options)
   end
 
   defp build_column_sorts(%Params{order: orders} = params, columns) do
     for order <- orders do
       with dir when is_atom(dir) <- cast_dir(order.dir),
-            %Column{} = column <- params.columns[order.column],
-            true <- column.orderable,
-            {column, join_index} when is_number(join_index)
-                                  <- cast_column(column.data, columns) do
+           %Column{} = column <- params.columns[order.column],
+           true <- column.orderable,
+           {column, join_index} when is_number(join_index) <-
+             cast_column(column.data, columns) do
         {dir, column, join_index}
       end
     end
@@ -41,13 +42,14 @@ defmodule PhoenixDatatables.Query do
 
   defp build_schema_sorts(queryable, %Params{order: orders} = params) do
     schema = schema(queryable)
+
     for order <- orders do
       with dir when is_atom(dir) <- cast_dir(order.dir),
-            %Column{} = column <- params.columns[order.column],
-            true <- column.orderable,
-            %Attribute{} = attribute <- Attribute.extract(column.data, schema),
-              join_index when is_number(join_index)
-                          <- join_order(queryable, attribute.parent) do
+           %Column{} = column <- params.columns[order.column],
+           true <- column.orderable,
+           %Attribute{} = attribute <- Attribute.extract(column.data, schema),
+           join_index when is_number(join_index) <-
+             join_order(queryable, attribute.parent) do
         {dir, attribute.name, join_index}
       end
     end
@@ -61,21 +63,23 @@ defmodule PhoenixDatatables.Query do
 
   @doc false
   def join_order(_, nil), do: 0
+
   def join_order(%Ecto.Query{} = queryable, parent) do
     case Enum.find_index(queryable.joins, &(join_relation(&1) == parent)) do
       nil -> nil
       number when is_number(number) -> number + 1
     end
   end
+
   def join_order(queryable, parent) do
     QueryException.raise(:join_order, """
 
-      An attempt was made to interrogate the join structure of #{inspect queryable}
+      An attempt was made to interrogate the join structure of #{inspect(queryable)}
       This is not an %Ecto.Query{}. The most likely cause for this error is using
       dot-notation(e.g. 'category.name') in the column name defined in the datatables
       client config but a simple Schema (no join) is used as the underlying queryable.
 
-      Please check the client config for the fields belonging to #{inspect parent}. If
+      Please check the client config for the fields belonging to #{inspect(parent)}. If
       the required field does belong to a different parent schema, that schema needs to
       be joined in the Ecto query.
 
@@ -83,6 +87,7 @@ defmodule PhoenixDatatables.Query do
   end
 
   defp join_relation(%JoinExpr{assoc: {_, relation}}), do: relation
+
   defp join_relation(_) do
     QueryException.raise(:join_relation, """
 
@@ -107,27 +112,36 @@ defmodule PhoenixDatatables.Query do
 
     """)
   end
+
   defp check_from(from), do: from
 
   defp cast_column(column_name, sortable)
-    when is_list(sortable)
-         and is_tuple(hd(sortable))
-         and is_atom(elem(hd(sortable), 0)) do #Keyword
+       # Keyword
+       when is_list(sortable) and
+              is_tuple(hd(sortable)) and
+              is_atom(elem(hd(sortable), 0)) do
     [parent | child] = String.split(column_name, ".")
+
     if parent in Enum.map(Keyword.keys(sortable), &Atom.to_string/1) do
       member = Keyword.fetch!(sortable, String.to_atom(parent))
+
       case member do
         children when is_list(children) ->
           with [child] <- child,
-               [child] <- Enum.filter(Keyword.keys(children),
-                                      &(Atom.to_string(&1) == child)),
-               {:ok, order} when is_number(order)
-                              <- Keyword.fetch(children, child) do
+               [child] <-
+                 Enum.filter(
+                   Keyword.keys(children),
+                   &(Atom.to_string(&1) == child)
+                 ),
+               {:ok, order} when is_number(order) <-
+                 Keyword.fetch(children, child) do
             {child, order}
           else
             _ -> {:error, "#{column_name} is not a sortable column."}
           end
-        order when is_number(order) -> {String.to_atom(parent), order}
+
+        order when is_number(order) ->
+          {String.to_atom(parent), order}
       end
     else
       {:error, "#{column_name} is not a sortable column."}
@@ -166,7 +180,9 @@ defmodule PhoenixDatatables.Query do
       true ->
         {num, _} = Integer.parse(num)
         num
-      false -> num
+
+      false ->
+        num
     end
   end
 
@@ -180,22 +196,29 @@ defmodule PhoenixDatatables.Query do
     columns = options[:columns]
     do_search(queryable, params, columns)
   end
+
   defp do_search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
+
   defp do_search(queryable, %Params{} = params, searchable) when is_list(searchable) do
     search_term = "%#{params.search.value}%"
     dynamic = dynamic([], false)
-    dynamic = Enum.reduce params.columns, dynamic, fn({_, v}, acc_dynamic) ->
-      with {column, join_index} when is_number(join_index)
-                                  <- v.data |> cast_column(searchable),
-            true <- v.searchable do
-        acc_dynamic
-        |> search_relation(join_index,
-                          column,
-                          search_term)
-      else
-        _ -> acc_dynamic
-      end
-    end
+
+    dynamic =
+      Enum.reduce(params.columns, dynamic, fn {_, v}, acc_dynamic ->
+        with {column, join_index} when is_number(join_index) <-
+               v.data |> cast_column(searchable),
+             true <- v.searchable do
+          acc_dynamic
+          |> search_relation(
+            join_index,
+            column,
+            search_term
+          )
+        else
+          _ -> acc_dynamic
+        end
+      end)
+
     where(queryable, [], ^dynamic)
   end
 
@@ -203,18 +226,61 @@ defmodule PhoenixDatatables.Query do
     search_term = "%#{search.value}%"
     schema = schema(queryable)
     dynamic = dynamic([], false)
+
     dynamic =
-      Enum.reduce columns, dynamic, fn({_, v}, acc_dynamic) ->
+      Enum.reduce(columns, dynamic, fn {_, v}, acc_dynamic ->
         with %Attribute{} = attribute <- v.data |> Attribute.extract(schema),
-              true <- v.searchable do
+             true <- v.searchable do
           acc_dynamic
-          |> search_relation(join_order(queryable, attribute.parent),
-                          attribute.name,
-                          search_term)
+          |> search_relation(
+            join_order(queryable, attribute.parent),
+            attribute.name,
+            search_term
+          )
         else
           _ -> acc_dynamic
         end
-      end
+      end)
+
+    where(queryable, [], ^dynamic)
+  end
+
+  def search_columns(queryable, params, options \\ []) do
+    if has_column_search?(params.columns) do
+      columns = options[:columns] || []
+      do_search_columns(queryable, params, columns)
+    else
+      queryable
+    end
+  end
+
+  defp has_column_search?(columns) when is_map(columns) do
+    columns = Map.values(columns)
+    Enum.any?(columns, &(&1.search.value != ""))
+  end
+
+  defp has_column_search?(_), do: false
+
+  defp do_search_columns(queryable, params, columns) do
+    dynamic = dynamic([], true)
+
+    dynamic =
+      Enum.reduce(params.columns, dynamic, fn {_, v}, acc_dynamic ->
+        with {column, join_index} when is_number(join_index) <-
+               cast_column(v.data, columns),
+             true <- v.searchable,
+             true <- v.search.value != "" do
+          acc_dynamic
+          |> search_relation_and(
+            join_index,
+            column,
+            "%#{v.search.value}%"
+          )
+        else
+          _ -> acc_dynamic
+        end
+      end)
+
     where(queryable, [], ^dynamic)
   end
 
@@ -239,15 +305,15 @@ defmodule PhoenixDatatables.Query do
 
     total_entries || 0
   end
-
 end
 
 defmodule PhoenixDatatables.QueryException do
   defexception [:message, :operation]
 
-  @dialyzer {:no_return, raise: 1} #yes we know it raises
+  # yes we know it raises
+  @dialyzer {:no_return, raise: 1}
 
   def raise(operation, message \\ "") do
-    Kernel.raise __MODULE__, [operation: operation, message: message]
+    Kernel.raise(__MODULE__, operation: operation, message: message)
   end
 end

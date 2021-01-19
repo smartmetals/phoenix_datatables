@@ -280,6 +280,64 @@ defmodule PhoenixDatatables.QueryTest do
 
   end
 
+  describe "search_columns" do
+    test "returns 1 result when 1 column matches" do
+      add_items()
+
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id, category_name: category.name, nsn: item.nsn})
+
+      request = Factory.raw_request()
+      params = update_in(request, ["columns", "0", "search"], &(Map.put(&1, "value", "1NSN")))
+      |> Request.receive()
+
+      results = Query.search_columns(query, params, [columns: [id: 0, category_name: 0, nsn: 0]])
+        |> Repo.all()
+
+      assert Enum.count(results) == 1
+    end
+
+    test "returns both results when they all match column searches" do
+      add_items()
+
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id, category_name: category.name, nsn: item.nsn})
+
+      request = Factory.raw_request()
+      params = update_in(request, ["columns", "0", "search"], &(Map.put(&1, "value", "NSN")))
+      |> Request.receive()
+
+      results = Query.search_columns(query, params, [columns: [id: 0, category_name: 0, nsn: 0]])
+        |> Repo.all()
+
+      assert Enum.count(results) == 2
+    end
+
+    test "returns no results when not all columns match" do
+      add_items()
+
+      query =
+        (from item in Item,
+          join: category in assoc(item, :category),
+          select: %{id: item.id, category_name: category.name, nsn: item.nsn, aac: item.aac})
+
+      request = Factory.raw_request()
+      params = request
+      |> update_in(["columns", "0", "search"], &(Map.put(&1, "value", "NSN")))
+      |> update_in(["columns", "6", "search"], &(Map.put(&1, "value", "no match")))
+      |> Request.receive()
+
+      results = Query.search_columns(query, params, [columns: [id: 0, category_name: 0, nsn: 0, aac: 0]])
+        |> Repo.all()
+
+      assert Enum.empty?(results)
+    end
+  end
+
   describe "total_entries" do
     test "returns number of results in specified schema" do
       add_items()
