@@ -254,12 +254,12 @@ defmodule PhoenixDatatables.Query do
     end
   end
 
-  defp has_column_search?(columns) when is_map(columns) do
+  def has_column_search?(columns) when is_map(columns) do
     columns = Map.values(columns)
     Enum.any?(columns, &(&1.search.value != ""))
   end
 
-  defp has_column_search?(_), do: false
+  def has_column_search?(_), do: false
 
   defp do_search_columns(queryable, params, columns) do
     dynamic = dynamic([], true)
