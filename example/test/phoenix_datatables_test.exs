@@ -59,7 +59,7 @@ defmodule PhoenixDatatablesTest do
       assert draw == request["draw"]
     end
 
-    test "do all of the things in phoenix datatables to sort columns" do
+    test "do all of the things in phoenix datatables to search columns" do
       { request, query } = create_request_and_query()
       request = request
       |> update_in(["columns", "0", "search"], &(Map.put(&1, "value", "1NSN")))
