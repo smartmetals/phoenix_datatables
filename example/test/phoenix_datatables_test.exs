@@ -58,6 +58,26 @@ defmodule PhoenixDatatablesTest do
       } = PhoenixDatatables.execute(query, request, Repo, [total_entries: 25])
       assert draw == request["draw"]
     end
+
+    test "do all of the things in phoenix datatables to sort columns" do
+      { request, query } = create_request_and_query()
+      request = request
+      |> update_in(["columns", "0", "search"], &(Map.put(&1, "value", "1NSN")))
+      |> Map.put("search", %{"regex" => "false", "value" => ""})
+
+      assert %Payload{
+        data: data,
+        draw: draw,
+        error: _error,
+        recordsFiltered: recordsFiltered,
+        recordsTotal: recordsTotal
+      } = PhoenixDatatables.execute(query, request, Repo, [columns: [id: 0, common_name: 0, nsn: 0]])
+
+      assert draw == request["draw"]
+      assert Enum.count(data) == 1
+      assert recordsTotal == 2
+      assert recordsFiltered == 1
+    end
   end
 
   def create_request_and_query do
@@ -68,7 +88,7 @@ defmodule PhoenixDatatablesTest do
     query =
       (from item in Item,
         join: category in assoc(item, :category),
-        select: %{id: item.id, category_name: category.name})
+        select: %{id: item.id, category_name: category.name, nsn: item.nsn})
     {request, query}
   end
 

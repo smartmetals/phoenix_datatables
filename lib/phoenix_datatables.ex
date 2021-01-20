@@ -85,7 +85,7 @@ defmodule PhoenixDatatables do
       |> Query.paginate(params)
 
     filtered_entries =
-      if params.search.value == "" do
+      if params.search.value == "" and not Query.has_column_search?(params.columns) do
         total_entries
       else
         Query.total_entries(filtered_query, repo)
