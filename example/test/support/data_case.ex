@@ -58,7 +58,7 @@ defmodule PhoenixDatatablesExample.DataCase do
 
   def load_test_seeds(nsn_limit \\ 10) do
     unless Code.ensure_loaded?(Seeds.Load) do
-      Code.load_file("priv/repo/seeds_load.exs")
+      Code.eval_file("priv/repo/seeds_load.exs")
     end
     Seeds.Load.all(nsn_limit)
   end

@@ -15,6 +15,7 @@ defmodule PhoenixDatatablesExample.Stock.Item do
     field :rep_office, :string
     field :ui, :string
     field :nilable_field, :string
+    #field :search_text, :tsvector
     belongs_to :category, Category
     belongs_to :unit, Unit
 
