@@ -63,4 +63,3 @@ defmodule PhoenixDatatables.QueryTest do
   end
 
 end
-

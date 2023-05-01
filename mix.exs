@@ -34,7 +34,7 @@ defmodule PhoenixDatatables.Mixfile do
       {:plug, "~> 1.4", only: :dev}, #only used in specs/docs
       {:dialyxir, "~> 1.0.0-rc.6", only: :dev, runtime: false},
       {:jason, "~> 1.1"},
-      {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 
