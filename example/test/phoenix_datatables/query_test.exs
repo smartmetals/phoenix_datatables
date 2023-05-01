@@ -256,7 +256,7 @@ defmodule PhoenixDatatables.QueryTest do
         query
         |> Query.search(params)
         |> Repo.all
-      assert Enum.count(results) == 0
+      assert Enum.empty?(results)
     end
 
     test "will only search in searchable fields when those are specified" do
@@ -275,7 +275,7 @@ defmodule PhoenixDatatables.QueryTest do
         Query.search(query, params, columns: [:frogs])
         |> Repo.all
 
-      assert Enum.count(results) == 0
+      assert Enum.empty?(results)
     end
 
   end
