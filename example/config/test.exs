@@ -1,26 +1,33 @@
-use Mix.Config
+import Config
+
+# Configure your database
+#
+# The MIX_TEST_PARTITION environment variable can be used
+# to provide built-in test partitioning in CI environment.
+# Run `mix help test` for more information.
+config :phoenix_datatables_example, PhoenixDatatablesExample.Repo,
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "phoenix_datatables_example_test#{System.get_env("MIX_TEST_PARTITION")}",
+  pool: Ecto.Adapters.SQL.Sandbox,
+  pool_size: 10
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :phoenix_datatables_example, PhoenixDatatablesExampleWeb.Endpoint,
-  http: [port: 4001],
+  http: [ip: {127, 0, 0, 1}, port: 4002],
+  secret_key_base: "F6v1XyrSD2TCUp37XflC0FQn7cIpAAQfbzYVcZaFYhl7TwLNA8xbkA4SdjWWzvgG",
   server: false
 
-# Print only warnings and errors during test unless verbose
-if System.get_env("VERBOSE") == "true" do
-  config :logger, :console, format: "[$level] $message\n"
-else
-  config :logger, level: :warn
-end
+# In test we don't send emails.
+config :phoenix_datatables_example, PhoenixDatatablesExample.Mailer, adapter: Swoosh.Adapters.Test
 
+# Disable swoosh api client as it is only required for production adapters.
+config :swoosh, :api_client, false
 
-# Configure your database
-config :phoenix_datatables_example, PhoenixDatatablesExample.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: System.get_env("POSTGRES_USER") ||
-            "whoami" |> System.cmd([]) |> elem(0) |> String.trim(),
-  password: System.get_env("POSTGRES_PASSWORD"),
+# Print only warnings and errors during test
+config :logger, level: :warning
 
-  database: "phoenix_datatables_example_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+# Initialize plugs at runtime for faster test compilation
+config :phoenix, :plug_init_mode, :runtime

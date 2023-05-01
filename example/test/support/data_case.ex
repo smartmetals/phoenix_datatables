@@ -7,9 +7,11 @@ defmodule PhoenixDatatablesExample.DataCase do
   your tests.
 
   Finally, if the test case interacts with the database,
-  it cannot be async. For this reason, every test runs
-  inside a transaction which is reset at the beginning
-  of the test unless the test case is marked as async.
+  we enable the SQL sandbox, so changes done to the database
+  are reverted at the end of every test. If you are using
+  PostgreSQL, you can even run database tests asynchronously
+  by setting `use PhoenixDatatablesExample.DataCase, async: true`, although
+  this option is not recommended for other databases.
   """
 
   use ExUnit.CaseTemplate
@@ -26,17 +28,20 @@ defmodule PhoenixDatatablesExample.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(PhoenixDatatablesExample.Repo)
-
-    unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(PhoenixDatatablesExample.Repo, {:shared, self()})
-    end
-
+    PhoenixDatatablesExample.DataCase.setup_sandbox(tags)
     :ok
   end
 
   @doc """
-  A helper that transform changeset errors to a map of messages.
+  Sets up the sandbox based on the test tags.
+  """
+  def setup_sandbox(tags) do
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(PhoenixDatatablesExample.Repo, shared: not tags[:async])
+    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  end
+
+  @doc """
+  A helper that transforms changeset errors into a map of messages.
 
       assert {:error, changeset} = Accounts.create_user(%{password: "short"})
       assert "password is too short" in errors_on(changeset).password
@@ -45,8 +50,8 @@ defmodule PhoenixDatatablesExample.DataCase do
   """
   def errors_on(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
-      Enum.reduce(opts, message, fn {key, value}, acc ->
-        String.replace(acc, "%{#{key}}", to_string(value))
+      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
+        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
       end)
     end)
   end
@@ -57,5 +62,4 @@ defmodule PhoenixDatatablesExample.DataCase do
     end
     Seeds.Load.all(nsn_limit)
   end
-
 end
