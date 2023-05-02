@@ -280,6 +280,29 @@ defmodule PhoenixDatatables.QueryTest do
 
   end
 
+  describe "search pg_fulltext" do
+    test "works like search but will match keywords in any order" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name}
+      )
+      params =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "pots 1NSN"}
+        )
+        |> Request.receive
+      results =
+        query
+        |> Query.search(params, pg_fulltext: "search_text")
+        |> Repo.all
+      assert Enum.count(results) == 1
+    end
+  end
+
   describe "search_columns" do
     test "returns 1 result when 1 column matches" do
       add_items()
