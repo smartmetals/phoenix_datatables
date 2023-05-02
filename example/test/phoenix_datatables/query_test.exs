@@ -297,7 +297,7 @@ defmodule PhoenixDatatables.QueryTest do
         |> Request.receive
       results =
         query
-        |> Query.search(params, pg_fulltext: "search_text")
+        |> Query.search(params, pg_fulltext: :search_text)
         |> Repo.all
       assert Enum.count(results) == 1
     end
