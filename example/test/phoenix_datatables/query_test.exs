@@ -301,6 +301,27 @@ defmodule PhoenixDatatables.QueryTest do
         |> Repo.all
       assert Enum.count(results) == 1
     end
+
+    test "all terms are required to match" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name}
+      )
+      params =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "pots ham 1NSN"}
+        )
+        |> Request.receive
+      results =
+        query
+        |> Query.search(params, pg_fulltext: :search_text)
+        |> Repo.all
+      assert Enum.count(results) == 0
+    end
   end
 
   describe "search_columns" do
