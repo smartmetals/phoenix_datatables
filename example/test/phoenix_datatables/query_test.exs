@@ -281,7 +281,7 @@ defmodule PhoenixDatatables.QueryTest do
   end
 
   describe "search pg_fulltext" do
-    test "works like search but will match keywords in any order" do
+    test "works like ilike search but will match keywords with prefix in any order" do
       add_items()
       query =
       (from item in Item,
@@ -292,7 +292,7 @@ defmodule PhoenixDatatables.QueryTest do
         Map.put(
           Factory.raw_request,
           "search",
-          %{"regex" => "false", "value" => "pots 1NSN"}
+          %{"regex" => "false", "value" => "pots 1NS"}
         )
         |> Request.receive
       results =

@@ -252,8 +252,9 @@ defmodule PhoenixDatatables.Query do
   defp do_fulltext_search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
 
   defp do_fulltext_search(queryable, %Params{search: %Search{value: search_term}}, column) do
+    search_query = search_term |> String.trim() |> String.split(~r/\W+/) |> Enum.map_join(" & ", &("#{&1}:*"))
     from [t] in queryable,
-      where: fragment("? @@ plainto_tsquery('english', ?)", field(t, ^column), ^search_term)
+      where: fragment("? @@ to_tsquery('english', ?)", field(t, ^column), ^search_query)
   end
 
   def search_columns(queryable, params, options \\ []) do
