@@ -193,8 +193,12 @@ defmodule PhoenixDatatables.Query do
   for details.
   """
   def search(queryable, params, options \\ []) do
-    columns = options[:columns]
-    do_search(queryable, params, columns)
+    if column = options[:pg_fulltext] do
+      do_fulltext_search(queryable, params, column)
+    else
+      columns = options[:columns]
+      do_search(queryable, params, columns)
+    end
   end
 
   defp do_search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
@@ -243,6 +247,20 @@ defmodule PhoenixDatatables.Query do
       end)
 
     where(queryable, [], ^dynamic)
+  end
+
+  defp do_fulltext_search(queryable, %Params{search: %Search{value: ""}}, _), do: queryable
+
+  defp do_fulltext_search(queryable, %Params{search: %Search{value: search_term}}, column) do
+    search_term = Regex.replace(~r/[^[:alnum:][:space:]\-]/, search_term, "")
+    search_query =
+      search_term
+      |> String.trim()
+      |> String.split(~r/(?<![[:alnum:]])-|\s+/)
+      |> Enum.filter(&(&1 != ""))
+      |> Enum.map_join(" & ", &("#{&1}:*"))
+    from [t] in queryable,
+      where: fragment("? @@ to_tsquery('english', ?)", field(t, ^column), ^search_query)
   end
 
   def search_columns(queryable, params, options \\ []) do

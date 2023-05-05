@@ -256,7 +256,7 @@ defmodule PhoenixDatatables.QueryTest do
         query
         |> Query.search(params)
         |> Repo.all
-      assert Enum.count(results) == 0
+      assert Enum.empty?(results)
     end
 
     test "will only search in searchable fields when those are specified" do
@@ -275,9 +275,74 @@ defmodule PhoenixDatatables.QueryTest do
         Query.search(query, params, columns: [:frogs])
         |> Repo.all
 
-      assert Enum.count(results) == 0
+      assert Enum.empty?(results)
     end
 
+  end
+
+  describe "search pg_fulltext" do
+    test "works like ilike search but will match keywords with prefix in any order" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name}
+      )
+      params =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "- pots 1NS"}
+        )
+        |> Request.receive
+      results =
+        query
+        |> Query.search(params, pg_fulltext: :search_text)
+        |> Repo.all
+      assert Enum.count(results) == 1
+    end
+
+    test "all terms are required to match" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name}
+      )
+      params =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "pots ham 1NSN"}
+        )
+        |> Request.receive
+      results =
+        query
+        |> Query.search(params, pg_fulltext: :search_text)
+        |> Repo.all
+      refute Enum.empty(results)
+    end
+
+    test "punctuation/special characters are ignored" do
+      add_items()
+      query =
+      (from item in Item,
+        join: category in assoc(item, :category),
+        select: %{id: item.id, category_name: category.name}
+      )
+      params =
+        Map.put(
+          Factory.raw_request,
+          "search",
+          %{"regex" => "false", "value" => "pots 1NSN%"}
+        )
+        |> Request.receive
+      results =
+        query
+        |> Query.search(params, pg_fulltext: :search_text)
+        |> Repo.all
+      assert Enum.count(results) == 1
+    end
   end
 
   describe "search_columns" do

@@ -6,7 +6,7 @@ defmodule Seeds.Load do
 
   def init do
     for file <- Path.wildcard(@seeds) do
-      Code.load_file(file)
+      Code.eval_file(file)
     end
   end
 

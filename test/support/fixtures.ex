@@ -1,22 +1,3 @@
-defmodule PhoenixDatatables.Fixtures.Stock.Item do
-  use Ecto.Schema
-  alias PhoenixDatatables.Fixtures.Stock.Category
-  alias PhoenixDatatables.Fixtures.Stock.Unit
-
-  schema "items" do
-    field :aac, :string
-    field :common_name, :string
-    field :description, :string
-    field :nsn, :string
-    field :price, :float
-    field :rep_office, :string
-    field :ui, :string
-    field :nilable_field, :string
-    belongs_to :category, Category
-    belongs_to :unit, Unit
-  end
-end
-
 defmodule PhoenixDatatables.Fixtures.Stock.Category do
   use Ecto.Schema
   alias PhoenixDatatables.Fixtures.Stock.Item
@@ -35,6 +16,25 @@ defmodule PhoenixDatatables.Fixtures.Stock.Unit do
     field :description, :string
     field :ui_code, :string
     has_many :items, Item
+  end
+end
+
+defmodule PhoenixDatatables.Fixtures.Stock.Item do
+  use Ecto.Schema
+  alias PhoenixDatatables.Fixtures.Stock.Category
+  alias PhoenixDatatables.Fixtures.Stock.Unit
+
+  schema "items" do
+    field :aac, :string
+    field :common_name, :string
+    field :description, :string
+    field :nsn, :string
+    field :price, :float
+    field :rep_office, :string
+    field :ui, :string
+    field :nilable_field, :string
+    belongs_to :category, Category
+    belongs_to :unit, Unit
   end
 end
 

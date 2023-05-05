@@ -2,7 +2,7 @@ defmodule PhoenixDatatablesExampleWeb.PageControllerTest do
   use PhoenixDatatablesExampleWeb.ConnCase
 
   test "GET /", %{conn: conn} do
-    conn = get conn, "/"
-    assert redirected_to(conn) == Routes.item_path(conn, :index)
+    conn = get(conn, ~p"/")
+    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
   end
 end
