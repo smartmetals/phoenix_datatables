@@ -253,7 +253,12 @@ defmodule PhoenixDatatables.Query do
 
   defp do_fulltext_search(queryable, %Params{search: %Search{value: search_term}}, column) do
     search_term = Regex.replace(~r/[^[:alnum:][:space:]\-]/, search_term, "")
-    search_query = search_term |> String.trim() |> String.split(~r/\W+/) |> Enum.map_join(" & ", &("#{&1}:*"))
+    search_query =
+      search_term
+      |> String.trim()
+      |> String.split(~r/(?<![[:alnum:]])-|\s+/)
+      |> Enum.filter(&(&1 != ""))
+      |> Enum.map_join(" & ", &("#{&1}:*"))
     from [t] in queryable,
       where: fragment("? @@ to_tsquery('english', ?)", field(t, ^column), ^search_query)
   end

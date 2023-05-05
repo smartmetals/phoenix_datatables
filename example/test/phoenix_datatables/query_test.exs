@@ -292,7 +292,7 @@ defmodule PhoenixDatatables.QueryTest do
         Map.put(
           Factory.raw_request,
           "search",
-          %{"regex" => "false", "value" => "pots - 1NS"}
+          %{"regex" => "false", "value" => "- pots 1NS"}
         )
         |> Request.receive
       results =
@@ -320,7 +320,7 @@ defmodule PhoenixDatatables.QueryTest do
         query
         |> Query.search(params, pg_fulltext: :search_text)
         |> Repo.all
-      assert Enum.count(results) == 0
+      refute Enum.empty(results)
     end
 
     test "punctuation/special characters are ignored" do
